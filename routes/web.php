@@ -15,6 +15,8 @@ Route::get('/courses', function () {
     return Inertia::render('Courses');
 })->name('courses');
 
+// Register route được xử lý bởi Fortify
+
 // Login selector - trang chọn loại tài khoản đăng nhập
 Route::get('/login', function () {
     return Inertia::render('auth/LoginSelector');
@@ -47,6 +49,11 @@ Route::get('/login/admin', function () {
         'status' => session('status'),
     ]);
 })->name('login.admin');
+
+// POST route for admin login
+Route::post('/login/admin', function () {
+    return redirect()->route('login.admin');
+})->name('login.admin.post');
 
 // Test route để kiểm tra
 Route::get('/test-home', function () {
@@ -186,12 +193,152 @@ Route::get('/create-test-user', function () {
     }
 });
 
+// Create admin user with specific email
+Route::get('/create-admin-user', function () {
+    try {
+        // Delete existing admin user
+        \App\Models\User::where('email', 'admin@localhost.com')->delete();
+        
+        // Create new admin user
+        $user = \App\Models\User::create([
+            'name' => 'Admin',
+            'email' => 'admin@localhost.com',
+            'password' => bcrypt('123456'),
+            'role' => 'admin',
+            'email_verified_at' => now(),
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Admin user created successfully',
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'password_hash' => substr($user->password, 0, 20) . '...'
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+    }
+});
+
+// Create teacher user
+Route::get('/create-teacher-user', function () {
+    try {
+        // Delete existing teacher user
+        \App\Models\User::where('email', 'teacher@doraedu.com')->delete();
+        
+        // Create new teacher user
+        $user = \App\Models\User::create([
+            'name' => 'Nguyễn Văn Giáo',
+            'email' => 'teacher@doraedu.com',
+            'password' => bcrypt('123456'),
+            'role' => 'teacher',
+            'gender' => 'male',
+            'phone' => '0123456789',
+            'email_verified_at' => now(),
+        ]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Teacher user created successfully',
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'gender' => $user->gender,
+                'phone' => $user->phone,
+                'password_hash' => substr($user->password, 0, 20) . '...'
+            ]
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+    }
+});
+
+// Create multiple sample teachers
+Route::get('/create-sample-teachers', function () {
+    try {
+        $teachers = [
+            [
+                'name' => 'Trần Thị Minh',
+                'email' => 'minh.teacher@doraedu.com',
+                'password' => bcrypt('123456'),
+                'role' => 'teacher',
+                'gender' => 'female',
+                'phone' => '0987654321',
+                'email_verified_at' => now(),
+            ],
+            [
+                'name' => 'Lê Văn Hùng',
+                'email' => 'hung.teacher@doraedu.com',
+                'password' => bcrypt('123456'),
+                'role' => 'teacher',
+                'gender' => 'male',
+                'phone' => '0369852147',
+                'email_verified_at' => now(),
+            ],
+            [
+                'name' => 'Phạm Thị Lan',
+                'email' => 'lan.teacher@doraedu.com',
+                'password' => bcrypt('123456'),
+                'role' => 'teacher',
+                'gender' => 'female',
+                'phone' => '0741258963',
+                'email_verified_at' => now(),
+            ]
+        ];
+        
+        $createdTeachers = [];
+        
+        foreach ($teachers as $teacherData) {
+            // Delete existing teacher with same email
+            \App\Models\User::where('email', $teacherData['email'])->delete();
+            
+            // Create new teacher
+            $user = \App\Models\User::create($teacherData);
+            $createdTeachers[] = [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'role' => $user->role,
+                'gender' => $user->gender,
+                'phone' => $user->phone,
+            ];
+        }
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Sample teachers created successfully',
+            'teachers' => $createdTeachers,
+            'count' => count($createdTeachers)
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString()
+        ]);
+    }
+});
+
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-// Admin routes
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+// Admin routes - chỉ admin mới có thể truy cập
+Route::middleware(['auth', 'ensure.role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', function () {
         return Inertia::render('Admin/Dashboard');
     })->name('dashboard');
@@ -207,6 +354,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::get('/students', function () {
         return Inertia::render('Admin/Students');
     })->name('students');
+    
+    Route::get('/users', function () {
+        return Inertia::render('Admin/Users');
+    })->name('users');
 });
 
 // Teacher routes

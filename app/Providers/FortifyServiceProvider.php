@@ -71,6 +71,26 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::twoFactorChallengeView(fn () => Inertia::render('auth/TwoFactorChallenge'));
 
         Fortify::confirmPasswordView(fn () => Inertia::render('auth/ConfirmPassword'));
+
+        // Configure redirects based on user role
+        Fortify::redirects('login', function (Request $request) {
+            $user = $request->user();
+            
+            if ($user) {
+                switch ($user->role) {
+                    case 'admin':
+                        return redirect()->route('admin.dashboard');
+                    case 'teacher':
+                        return redirect()->route('teacher.dashboard');
+                    case 'student':
+                        return redirect()->route('student.dashboard');
+                    default:
+                        return redirect()->route('dashboard');
+                }
+            }
+            
+            return redirect()->route('dashboard');
+        });
     }
 
     /**

@@ -86,7 +86,7 @@ const showPassword = ref(false);
 
                     <Form
                         method="post"
-                        :action="`/login/${userType || 'student'}`"
+                        action="/login"
                         :reset-on-success="['password']"
                         v-slot="{ errors, processing }"
                         class="flex flex-col gap-6"

@@ -80,7 +80,7 @@
               <option value="N1">N1</option>
               <option value="JLPT">JLPT</option>
               <option value="Kaiwa">Kaiwa</option>
-              <option value="BJT">BJT</option>
+              <option value="Business">Business</option>
             </select>
           </div>
         </div>

@@ -37,13 +37,13 @@ const user = page.props.auth.user;
             <div class="grid auto-rows-min gap-4 md:grid-cols-3">
                 <!-- Admin Dashboard -->
                 <template v-if="user.role === 'admin'">
-                    <Link :href="route('admin.users')" class="group">
+                    <Link href="/admin/users" class="group">
                         <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border bg-gradient-to-br from-red-500 to-pink-600 text-white p-6 hover:shadow-lg transition-shadow">
                             <h3 class="text-xl font-bold mb-2">Quản lý người dùng</h3>
                             <p class="text-red-100">Quản lý tài khoản admin, teacher, student</p>
                         </div>
                     </Link>
-                    <Link :href="route('admin.courses')" class="group">
+                    <Link href="/admin/courses" class="group">
                         <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border bg-gradient-to-br from-green-500 to-teal-600 text-white p-6 hover:shadow-lg transition-shadow">
                             <h3 class="text-xl font-bold mb-2">Quản lý khóa học</h3>
                             <p class="text-green-100">Tạo và quản lý tất cả khóa học</p>
@@ -57,13 +57,13 @@ const user = page.props.auth.user;
 
                 <!-- Teacher Dashboard -->
                 <template v-else-if="user.role === 'teacher'">
-                    <Link :href="route('teacher.courses')" class="group">
+                    <Link href="/teacher/courses" class="group">
                         <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border bg-gradient-to-br from-blue-500 to-cyan-600 text-white p-6 hover:shadow-lg transition-shadow">
                             <h3 class="text-xl font-bold mb-2">Khóa học của tôi</h3>
                             <p class="text-blue-100">Quản lý các khóa học đang dạy</p>
                         </div>
                     </Link>
-                    <Link :href="route('teacher.students')" class="group">
+                    <Link href="/teacher/students" class="group">
                         <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border bg-gradient-to-br from-orange-500 to-red-600 text-white p-6 hover:shadow-lg transition-shadow">
                             <h3 class="text-xl font-bold mb-2">Học sinh</h3>
                             <p class="text-orange-100">Quản lý danh sách học sinh</p>
@@ -77,13 +77,13 @@ const user = page.props.auth.user;
 
                 <!-- Student Dashboard -->
                 <template v-else-if="user.role === 'student'">
-                    <Link :href="route('student.courses')" class="group">
+                    <Link href="/student/courses" class="group">
                         <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border bg-gradient-to-br from-indigo-500 to-purple-600 text-white p-6 hover:shadow-lg transition-shadow">
                             <h3 class="text-xl font-bold mb-2">Khóa học của tôi</h3>
                             <p class="text-indigo-100">Xem các khóa học đã đăng ký</p>
                         </div>
                     </Link>
-                    <Link :href="route('student.profile')" class="group">
+                    <Link href="/student/profile" class="group">
                         <div class="relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border bg-gradient-to-br from-pink-500 to-rose-600 text-white p-6 hover:shadow-lg transition-shadow">
                             <h3 class="text-xl font-bold mb-2">Hồ sơ cá nhân</h3>
                             <p class="text-pink-100">Cập nhật thông tin cá nhân</p>
