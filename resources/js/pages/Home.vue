@@ -42,7 +42,6 @@
               Đăng ký
             </Link>
           </div>
-          <div></div>
         </div>
       </div>
     </header>
