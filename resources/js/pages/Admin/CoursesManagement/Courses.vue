@@ -32,16 +32,11 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Phân loại khóa học</label>
-            <select v-model="statusFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            <select v-model="categoryFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
               <option value="">Tất cả</option>
-              <option value="N5">N5</option>
-              <option value="N4">N4</option>
-              <option value="N3">N3</option>
-              <option value="N2">N2</option>
-              <option value="N1">N1</option>
-              <option value="JLPT">JLPT</option>
-              <option value="Kaiwa">Kaiwa</option>
-              <option value="Business">Business</option>
+              <option v-for="category in categories" :key="category.id" :value="category.id">
+                {{ category.name }}
+              </option>
             </select>
           </div>
           <div>
@@ -216,12 +211,13 @@ import AdminLayout from '@/layouts/AdminLayout.vue'
 
 // Props
 const props = defineProps({
-  courses: Object
+  courses: Object,
+  categories: Array
 })
 
 // Reactive data
 const search = ref('')
-const statusFilter = ref('')
+const categoryFilter = ref('')
 const typeFilter = ref('')
 
 // Computed
@@ -231,10 +227,10 @@ const filteredCourses = computed(() => {
   return props.courses.data.filter(course => {
     const matchesSearch = course.title.toLowerCase().includes(search.value.toLowerCase()) ||
                          course.description?.toLowerCase().includes(search.value.toLowerCase())
-    const matchesStatus = !statusFilter.value || course.status === statusFilter.value
+    const matchesCategory = !categoryFilter.value || course.category_id == categoryFilter.value
     const matchesType = !typeFilter.value || course.type === typeFilter.value
     
-    return matchesSearch && matchesStatus && matchesType
+    return matchesSearch && matchesCategory && matchesType
   })
 })
 

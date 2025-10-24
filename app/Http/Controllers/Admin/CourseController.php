@@ -16,8 +16,11 @@ class CourseController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
+        $categories = \App\Models\Category::get(['id', 'name']);
+
         return Inertia::render('Admin/CoursesManagement/Courses', [
-            'courses' => $courses
+            'courses' => $courses,
+            'categories' => $categories
         ]);
     }
 
