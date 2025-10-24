@@ -12,22 +12,9 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-// Define User interface
-interface User {
-    id: number;
-    name: string;
-    email: string;
-    role: string;
-    gender?: string;
-    phone?: string;
-    email_verified_at?: string;
-    created_at: string;
-    updated_at: string;
-}
-
 // Get user role from props
 const page = usePage();
-const user = page.props.auth.user as User;
+const user = page.props.auth.user;
 </script>
 
 <template>

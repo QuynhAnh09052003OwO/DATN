@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Laravel\Fortify\Features;
 
@@ -158,57 +157,6 @@ Route::get('/test-login-page', function () {
 </body>
 </html>';
 });
-
-// Test route để kiểm tra courses
-Route::get('/test-courses', function () {
-    try {
-        $courses = \App\Models\Course::paginate(15);
-        return response()->json([
-            'success' => true,
-            'courses' => $courses,
-            'count' => $courses->count()
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-    }
-});
-
-// Test route để debug admin courses
-Route::get('/debug-admin-courses', function () {
-    try {
-        $user = Auth::user();
-        if (!$user) {
-            return response()->json(['error' => 'Not authenticated']);
-        }
-        
-        if ($user->role !== 'admin') {
-            return response()->json(['error' => 'Not admin', 'role' => $user->role]);
-        }
-        
-        $courses = \App\Models\Course::paginate(15);
-        return response()->json([
-            'success' => true,
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'role' => $user->role
-            ],
-            'courses' => $courses,
-            'count' => $courses->count()
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage(),
-            'trace' => $e->getTraceAsString()
-        ]);
-    }
-})->middleware('auth');
 
 // Test route để tạo user test
 Route::get('/create-test-user', function () {
@@ -395,9 +343,9 @@ Route::middleware(['auth', 'ensure.role:admin'])->prefix('admin')->name('admin.'
         return Inertia::render('Admin/Dashboard');
     })->name('dashboard');
     
-    Route::resource('courses', \App\Http\Controllers\Admin\CourseController::class);
-    Route::patch('courses/{course}/publish', [\App\Http\Controllers\Admin\CourseController::class, 'publish'])->name('courses.publish');
-    Route::resource('categories', \App\Http\Controllers\Admin\CategoryController::class);
+    Route::get('/courses', function () {
+        return Inertia::render('Admin/Courses');
+    })->name('courses');
     
     Route::get('/teachers', function () {
         return Inertia::render('Admin/Teachers');

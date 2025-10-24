@@ -17,15 +17,7 @@ const showPassword = ref(false);
 const showPasswordConfirmation = ref(false);
 
 // Form validation
-interface FormData {
-    name: string;
-    email: string;
-    password: string;
-    password_confirmation: string;
-    gender: string;
-}
-
-const formData = ref<FormData>({
+const formData = ref({
     name: '',
     email: '',
     password: '',
@@ -68,7 +60,7 @@ const validateForm = () => {
 };
 
 // Watch form data changes
-const updateFormData = (field: keyof FormData, value: string) => {
+const updateFormData = (field: string, value: string) => {
     formData.value[field] = value;
     validateForm();
 };
