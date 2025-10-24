@@ -343,9 +343,11 @@ Route::middleware(['auth', 'ensure.role:admin'])->prefix('admin')->name('admin.'
         return Inertia::render('Admin/Dashboard');
     })->name('dashboard');
     
-    Route::get('/courses', function () {
-        return Inertia::render('Admin/Courses');
-    })->name('courses');
+    Route::get('/courses', [\App\Http\Controllers\Admin\CourseController::class, 'index'])->name('courses');
+    Route::post('/courses', [\App\Http\Controllers\Admin\CourseController::class, 'create'])->name('courses.create');
+    Route::get('/courses/{course}/edit', [\App\Http\Controllers\Admin\CourseController::class, 'edit'])->name('courses.edit');
+    Route::put('/courses/{course}', [\App\Http\Controllers\Admin\CourseController::class, 'update'])->name('courses.update');
+    Route::delete('/courses/{course}', [\App\Http\Controllers\Admin\CourseController::class, 'destroy'])->name('courses.destroy');
     
     Route::get('/teachers', function () {
         return Inertia::render('Admin/Teachers');
