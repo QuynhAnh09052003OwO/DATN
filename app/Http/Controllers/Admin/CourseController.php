@@ -71,7 +71,7 @@ class CourseController extends Controller
 
         $course->update($request->all());
 
-        return redirect()->route('admin.courses.index')
+        return redirect()->route('admin.courses')
             ->with('success', 'Khóa học đã được cập nhật thành công!');
     }
 
@@ -79,7 +79,7 @@ class CourseController extends Controller
     {
         $course->delete();
 
-        return redirect()->route('admin.courses.index')
+        return redirect()->route('admin.courses')
             ->with('success', 'Khóa học đã được xóa thành công!');
     }
 }
