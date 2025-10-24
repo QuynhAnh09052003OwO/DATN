@@ -24,12 +24,36 @@
           </svg>
           Tổng quan
         </Link>
-        <Link href="/admin/courses" :class="{'bg-blue-100 text-blue-700': $page.url.startsWith('/admin/courses'), 'text-gray-600 hover:bg-gray-50 hover:text-gray-900': !$page.url.startsWith('/admin/courses')}" class="mt-1 flex items-center px-4 py-2 text-sm font-medium rounded-md">
-          <svg class="mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-          </svg>
-          Quản lý khóa học
-        </Link>
+        <!-- Quản lý khóa học - Menu cha -->
+        <div class="mt-1">
+          <button @click="toggleCoursesMenu" class="w-full flex items-center justify-between px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">
+            <div class="flex items-center">
+              <svg class="mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+              </svg>
+              Quản lý khóa học
+            </div>
+            <svg class="h-4 w-4 transition-transform duration-200" :class="{'rotate-90': coursesMenuOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+          
+          <!-- Menu con -->
+          <div v-show="coursesMenuOpen" class="ml-6 space-y-1">
+            <Link href="/admin/courses" :class="{'bg-blue-100 text-blue-700': $page.url === '/admin/courses', 'text-gray-600 hover:bg-gray-50 hover:text-gray-900': $page.url !== '/admin/courses'}" class="flex items-center px-4 py-2 text-sm font-medium rounded-md">
+              <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+              Danh sách khóa học
+            </Link>
+            <Link href="/admin/courses/categories" :class="{'bg-blue-100 text-blue-700': $page.url.startsWith('/admin/courses/categories'), 'text-gray-600 hover:bg-gray-50 hover:text-gray-900': !$page.url.startsWith('/admin/courses/categories')}" class="flex items-center px-4 py-2 text-sm font-medium rounded-md">
+              <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
+              </svg>
+              Phân loại khóa học
+            </Link>
+          </div>
+        </div>
         <Link href="/admin/teachers" :class="{'bg-blue-100 text-blue-700': $page.url.startsWith('/admin/teachers'), 'text-gray-600 hover:bg-gray-50 hover:text-gray-900': !$page.url.startsWith('/admin/teachers')}" class="mt-1 flex items-center px-4 py-2 text-sm font-medium rounded-md">
           <svg class="mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
@@ -103,7 +127,18 @@ const props = defineProps({
 
 const sidebarOpen = ref(false)
 const userMenuOpen = ref(false)
+const coursesMenuOpen = ref(false)
 
 const page = usePage()
 const user = page.props.auth.user
+
+// Auto-open courses menu if on courses pages
+if (page.url.startsWith('/admin/courses')) {
+  coursesMenuOpen.value = true
+}
+
+// Methods
+const toggleCoursesMenu = () => {
+  coursesMenuOpen.value = !coursesMenuOpen.value
+}
 </script>

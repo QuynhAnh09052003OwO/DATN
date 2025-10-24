@@ -343,11 +343,20 @@ Route::middleware(['auth', 'ensure.role:admin'])->prefix('admin')->name('admin.'
         return Inertia::render('Admin/Dashboard');
     })->name('dashboard');
     
+    // Courses routes
     Route::get('/courses', [\App\Http\Controllers\Admin\CourseController::class, 'index'])->name('courses');
     Route::post('/courses', [\App\Http\Controllers\Admin\CourseController::class, 'create'])->name('courses.create');
     Route::get('/courses/{course}/edit', [\App\Http\Controllers\Admin\CourseController::class, 'edit'])->name('courses.edit');
     Route::put('/courses/{course}', [\App\Http\Controllers\Admin\CourseController::class, 'update'])->name('courses.update');
     Route::delete('/courses/{course}', [\App\Http\Controllers\Admin\CourseController::class, 'destroy'])->name('courses.destroy');
+    
+    // Categories routes
+    Route::get('/courses/categories', [\App\Http\Controllers\Admin\CategoryController::class, 'index'])->name('courses.categories');
+    Route::get('/courses/categories/create', [\App\Http\Controllers\Admin\CategoryController::class, 'create'])->name('courses.categories.create');
+    Route::post('/courses/categories', [\App\Http\Controllers\Admin\CategoryController::class, 'store'])->name('courses.categories.store');
+    Route::get('/courses/categories/{category}/edit', [\App\Http\Controllers\Admin\CategoryController::class, 'edit'])->name('courses.categories.edit');
+    Route::put('/courses/categories/{category}', [\App\Http\Controllers\Admin\CategoryController::class, 'update'])->name('courses.categories.update');
+    Route::delete('/courses/categories/{category}', [\App\Http\Controllers\Admin\CategoryController::class, 'destroy'])->name('courses.categories.destroy');
     
     Route::get('/teachers', function () {
         return Inertia::render('Admin/Teachers');
