@@ -344,7 +344,7 @@ Route::middleware(['auth', 'ensure.role:admin'])->prefix('admin')->name('admin.'
     })->name('dashboard');
     
     Route::get('/courses', function () {
-        return Inertia::render('Admin/Courses');
+        return Inertia::render('Admin/CoursesManagement/Courses');
     })->name('courses');
     
     Route::get('/teachers', function () {
