@@ -4,7 +4,7 @@
       <!-- Header Actions -->
       <div class="flex justify-between items-center">
         <div>
-          <h2 class="text-2xl font-bold text-gray-900">Quản lý khóa học</h2>
+          <h2 class="text-2xl font-bold text-gray-900">Danh sách khóa học</h2>
           <p class="text-gray-600">Tạo và quản lý tất cả khóa học trong hệ thống</p>
         </div>
         <button 
@@ -31,11 +31,17 @@
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Trạng thái</label>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Phân loại khóa học</label>
             <select v-model="statusFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
               <option value="">Tất cả</option>
-              <option value="released">Đã phát hành</option>
-              <option value="draft">Bản nháp</option>
+              <option value="N5">N5</option>
+              <option value="N4">N4</option>
+              <option value="N3">N3</option>
+              <option value="N2">N2</option>
+              <option value="N1">N1</option>
+              <option value="JLPT">JLPT</option>
+              <option value="Kaiwa">Kaiwa</option>
+              <option value="Business">Business</option>
             </select>
           </div>
           <div>
