@@ -11,9 +11,7 @@ Route::get('/', function () {
 })->name('home');
 
 // Courses page for guest users
-Route::get('/courses', function () {
-    return Inertia::render('Courses');
-})->name('courses');
+Route::get('/courses', [\App\Http\Controllers\CourseController::class, 'index'])->name('courses');
 
 // Register route được xử lý bởi Fortify
 
@@ -348,6 +346,7 @@ Route::middleware(['auth', 'ensure.role:admin'])->prefix('admin')->name('admin.'
     Route::post('/courses', [\App\Http\Controllers\Admin\CourseController::class, 'create'])->name('courses.create');
     Route::get('/courses/{course}/edit', [\App\Http\Controllers\Admin\CourseController::class, 'edit'])->name('courses.edit');
     Route::put('/courses/{course}', [\App\Http\Controllers\Admin\CourseController::class, 'update'])->name('courses.update');
+    Route::patch('/courses/{course}/publish', [\App\Http\Controllers\Admin\CourseController::class, 'publish'])->name('courses.publish');
     Route::delete('/courses/{course}', [\App\Http\Controllers\Admin\CourseController::class, 'destroy'])->name('courses.destroy');
     
     // Categories routes

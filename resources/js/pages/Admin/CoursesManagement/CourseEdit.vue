@@ -64,21 +64,6 @@
               <div v-if="errors.type" class="mt-1 text-sm text-red-600">{{ errors.type }}</div>
             </div>
 
-            <!-- Trạng thái -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
-                Trạng thái <span class="text-red-500">*</span>
-              </label>
-              <select
-                v-model="form.status"
-                required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="draft">Bản nháp</option>
-                <option value="released">Đã phát hành</option>
-              </select>
-              <div v-if="errors.status" class="mt-1 text-sm text-red-600">{{ errors.status }}</div>
-            </div>
 
             <!-- Danh mục -->
             <div>
@@ -98,12 +83,77 @@
             <!-- Hình ảnh -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Hình ảnh</label>
-              <input
-                v-model="form.image"
-                type="url"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="https://example.com/image.jpg"
-              />
+              
+              <!-- Image Preview -->
+              <div v-if="imagePreview" class="mb-4">
+                <img 
+                  :src="imagePreview" 
+                  alt="Preview" 
+                  class="w-32 h-32 object-cover rounded-lg border border-gray-300"
+                />
+                <button 
+                  @click="removeImage"
+                  type="button"
+                  class="mt-2 text-sm text-red-600 hover:text-red-800"
+                >
+                  Xóa ảnh
+                </button>
+              </div>
+              
+              <!-- Upload Area -->
+              <div 
+                class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors"
+                @dragover.prevent
+                @dragenter.prevent
+                @drop.prevent="handleDrop"
+              >
+                <input
+                  ref="fileInput"
+                  type="file"
+                  accept="image/*"
+                  @change="handleFileSelect"
+                  class="hidden"
+                />
+                
+                <div v-if="!imagePreview" class="space-y-2">
+                  <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                  </svg>
+                  <div class="text-sm text-gray-600">
+                    <button 
+                      @click="$refs.fileInput.click()"
+                      type="button"
+                      class="font-medium text-blue-600 hover:text-blue-500"
+                    >
+                      Chọn ảnh từ thiết bị
+                    </button>
+                    hoặc kéo thả ảnh vào đây
+                  </div>
+                  <p class="text-xs text-gray-500">PNG, JPG, GIF tối đa 10MB</p>
+                </div>
+                
+                <div v-else class="space-y-2">
+                  <button 
+                    @click="$refs.fileInput.click()"
+                    type="button"
+                    class="text-sm text-blue-600 hover:text-blue-500"
+                  >
+                    Thay đổi ảnh
+                  </button>
+                </div>
+              </div>
+              
+              <!-- URL Input (Alternative) -->
+              <div class="mt-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Hoặc nhập URL ảnh</label>
+                <input
+                  v-model="form.image"
+                  type="url"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="https://example.com/image.jpg"
+                />
+              </div>
+              
               <div v-if="errors.image" class="mt-1 text-sm text-red-600">{{ errors.image }}</div>
             </div>
 
@@ -206,12 +256,13 @@ const props = defineProps({
 // Reactive data
 const isSubmitting = ref(false)
 const errors = ref({})
+const imagePreview = ref('')
+const selectedFile = ref(null)
 
 const form = reactive({
   title: props.course?.title || '',
   description: props.course?.description || '',
   type: props.course?.type || 'video',
-  status: props.course?.status || 'draft',
   category_id: props.course?.category_id || null,
   image: props.course?.image || '',
   price: props.course?.price || 0,
@@ -221,12 +272,79 @@ const form = reactive({
 })
 
 // Methods
+const handleFileSelect = (event) => {
+  const file = event.target.files[0]
+  if (file) {
+    processFile(file)
+  }
+}
+
+const handleDrop = (event) => {
+  const files = event.dataTransfer.files
+  if (files.length > 0) {
+    processFile(files[0])
+  }
+}
+
+const processFile = (file) => {
+  // Validate file size (10MB max)
+  if (file.size > 10 * 1024 * 1024) {
+    alert('File quá lớn. Vui lòng chọn file nhỏ hơn 10MB.')
+    return
+  }
+  
+  // Validate file type
+  if (!file.type.startsWith('image/')) {
+    alert('Vui lòng chọn file ảnh.')
+    return
+  }
+  
+  selectedFile.value = file
+  
+  // Create preview
+  const reader = new FileReader()
+  reader.onload = (e) => {
+    imagePreview.value = e.target.result
+  }
+  reader.readAsDataURL(file)
+}
+
+const removeImage = () => {
+  imagePreview.value = ''
+  selectedFile.value = null
+  form.image = ''
+  // Reset file input
+  const fileInput = document.querySelector('input[type="file"]')
+  if (fileInput) {
+    fileInput.value = ''
+  }
+}
+
 const updateCourse = async () => {
   isSubmitting.value = true
   errors.value = {}
 
   try {
-    router.put(`/admin/courses/${props.course.id}`, form, {
+    // Create FormData for file upload
+    const formData = new FormData()
+    
+    // Add form fields
+    Object.keys(form).forEach(key => {
+      if (form[key] !== null && form[key] !== undefined) {
+        formData.append(key, form[key])
+      }
+    })
+    
+    // Add image file if selected
+    if (selectedFile.value) {
+      formData.append('image_file', selectedFile.value)
+    }
+    
+    router.post(`/admin/courses/${props.course.id}`, {
+      _method: 'PUT',
+      ...form,
+      image_file: selectedFile.value
+    }, {
       onError: (errs) => {
         errors.value = errs
         isSubmitting.value = false
@@ -252,7 +370,6 @@ onMounted(() => {
       title: props.course.title || '',
       description: props.course.description || '',
       type: props.course.type || 'video',
-      status: props.course.status || 'draft',
       category_id: props.course.category_id || null,
       image: props.course.image || '',
       price: props.course.price || 0,
@@ -260,6 +377,11 @@ onMounted(() => {
       is_published: props.course.is_published || false,
       teacher_id: props.course.teacher_id || null
     })
+    
+    // Set image preview if course has image
+    if (props.course.image) {
+      imagePreview.value = props.course.image
+    }
   }
 })
 </script>

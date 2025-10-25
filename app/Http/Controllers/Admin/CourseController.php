@@ -64,18 +64,39 @@ class CourseController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'type' => 'required|in:video,zoom',
-            'status' => 'required|in:released,draft',
             'category_id' => 'nullable|exists:categories,id',
             'image' => 'nullable|string',
+            'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240', // 10MB max
             'duration' => 'nullable|integer|min:0',
             'is_published' => 'boolean',
             'teacher_id' => 'nullable|exists:users,id',
         ]);
 
-        $course->update($request->all());
+        $data = $request->except(['image_file']);
+
+        // Handle image upload
+        if ($request->hasFile('image_file')) {
+            $file = $request->file('image_file');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $path = $file->storeAs('public/course-images', $filename);
+            $data['image'] = asset('storage/course-images/' . $filename);
+        }
+
+        $course->update($data);
 
         return redirect()->route('admin.courses')
             ->with('success', 'Khóa học đã được cập nhật thành công!');
+    }
+
+    public function publish(Course $course)
+    {
+        $course->update([
+            'status' => 'released',
+            'is_published' => true
+        ]);
+
+        return redirect()->route('admin.courses')
+            ->with('success', 'Khóa học đã được phát hành thành công!');
     }
 
     public function destroy(Course $course)

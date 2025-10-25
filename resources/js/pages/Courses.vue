@@ -60,10 +60,11 @@
 
       <!-- Filter Section -->
       <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form @submit.prevent="applyFilters" class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-800 mb-2">Tìm kiếm</label>
             <input 
+              v-model="filters.search"
               type="text" 
               placeholder="Tìm kiếm khóa học..."
               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 placeholder-gray-500"
@@ -71,41 +72,96 @@
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-800 mb-2">Phân loại khóa học</label>
-            <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900">
+            <select v-model="filters.category" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900">
               <option value="">Tất cả</option>
-              <option value="N5">N5</option>
-              <option value="N4">N4</option>
-              <option value="N3">N3</option>
-              <option value="N2">N2</option>
-              <option value="N1">N1</option>
-              <option value="JLPT">JLPT</option>
-              <option value="Kaiwa">Kaiwa</option>
-              <option value="Business">Business</option>
+              <option v-for="category in categories" :key="category.id" :value="category.id">
+                {{ category.name }}
+              </option>
             </select>
           </div>
-        </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-800 mb-2">Loại khóa học</label>
+            <select v-model="filters.type" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900">
+              <option value="">Tất cả</option>
+              <option value="video">Video (Record sẵn)</option>
+              <option value="zoom">Zoom (Học trực tiếp)</option>
+            </select>
+          </div>
+          <div class="md:col-span-3 flex justify-end">
+            <button 
+              type="submit"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition-colors"
+            >
+              Lọc khóa học
+            </button>
+          </div>
+        </form>
       </div>
 
       <!-- Courses Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        <!-- Course Card 1 -->
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-          <div class="h-48 bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
-            <div class="w-24 h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-              <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-              </svg>
+      <div v-if="courses.data && courses.data.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div 
+          v-for="course in courses.data" 
+          :key="course.id"
+          class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow course-card"
+          :data-type="course.type"
+        >
+          <!-- Course Image -->
+          <div class="h-48 relative">
+            <img 
+              v-if="course.image" 
+              :src="course.image" 
+              :alt="course.title"
+              class="w-full h-full object-cover"
+              @error="handleImageError"
+            />
+            <div 
+              v-else
+              class="h-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center"
+            >
+              <div class="w-24 h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
+                <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                </svg>
+              </div>
+            </div>
+            <!-- Type Badge -->
+            <div class="absolute top-4 left-4">
+              <span 
+                class="px-3 py-1 rounded-full text-xs font-medium"
+                :class="course.type === 'video' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'"
+              >
+                {{ course.type === 'video' ? 'Video' : 'Zoom' }}
+              </span>
             </div>
           </div>
+          
+          <!-- Course Content -->
           <div class="p-6">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-sm font-medium text-blue-600">Video-Based</span>
-              <span class="text-sm text-gray-500">4.8 ⭐</span>
+            <!-- Category -->
+            <div v-if="course.category" class="mb-2">
+              <span class="text-sm font-medium text-blue-600">{{ course.category.name }}</span>
             </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-2">Lập trình Python cơ bản</h3>
-            <p class="text-gray-600 mb-4">Học lập trình Python từ cơ bản đến nâng cao với các bài tập thực hành</p>
+            
+            <!-- Title -->
+            <h3 class="text-xl font-bold text-gray-900 mb-2 line-clamp-2">{{ course.title }}</h3>
+            
+            <!-- Description -->
+            <p class="text-gray-600 mb-4 line-clamp-3">{{ course.description || 'Chưa có mô tả' }}</p>
+            
+            <!-- Teacher -->
+            <div v-if="course.teacher" class="mb-4">
+              <div class="flex items-center">
+                <svg class="w-4 h-4 text-gray-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                </svg>
+                <span class="text-sm text-gray-600">Giảng viên: {{ course.teacher.name }}</span>
+              </div>
+            </div>
+            
+            <!-- Price and Action -->
             <div class="flex items-center justify-between">
-              <span class="text-lg font-bold text-green-600">2,500,000 VNĐ</span>
+              <span class="text-lg font-bold text-green-600">{{ formatPrice(course.price) }}</span>
               <Link 
                 href="/register" 
                 class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
@@ -115,146 +171,36 @@
             </div>
           </div>
         </div>
-
-        <!-- Course Card 2 -->
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-          <div class="h-48 bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center">
-            <div class="w-24 h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-              <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-              </svg>
-            </div>
-          </div>
-          <div class="p-6">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-sm font-medium text-blue-600 dark:text-blue-400">Online</span>
-              <span class="text-sm text-gray-500 dark:text-gray-400">4.9 ⭐</span>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Web Development với React</h3>
-            <p class="text-gray-600 dark:text-gray-400 mb-4">Xây dựng ứng dụng web hiện đại với React và các công nghệ liên quan</p>
-            <div class="flex items-center justify-between">
-              <span class="text-lg font-bold text-green-600 dark:text-green-400">3,200,000 VNĐ</span>
-              <Link 
-                href="/register" 
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
-              >
-                Đăng ký ngay
-              </Link>
-            </div>
-          </div>
+      </div>
+      
+      <!-- No Courses Message -->
+      <div v-else class="text-center py-12">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+          <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+          </svg>
+          <h3 class="text-lg font-medium text-gray-900 mb-2">Không tìm thấy khóa học nào</h3>
+          <p class="text-gray-600">Hãy thử thay đổi bộ lọc để tìm khóa học phù hợp với bạn.</p>
         </div>
-
-        <!-- Course Card 3 -->
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-          <div class="h-48 bg-gradient-to-br from-blue-700 to-blue-900 flex items-center justify-center">
-            <div class="w-24 h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-              <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-              </svg>
-            </div>
-          </div>
-          <div class="p-6">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-sm font-medium text-blue-600 dark:text-blue-400">Offline</span>
-              <span class="text-sm text-gray-500 dark:text-gray-400">4.7 ⭐</span>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Machine Learning cơ bản</h3>
-            <p class="text-gray-600 dark:text-gray-400 mb-4">Giới thiệu về Machine Learning và AI với các bài tập thực hành</p>
-            <div class="flex items-center justify-between">
-              <span class="text-lg font-bold text-green-600 dark:text-green-400">4,500,000 VNĐ</span>
-              <Link 
-                href="/register" 
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
-              >
-                Đăng ký ngay
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        <!-- Course Card 4 -->
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-          <div class="h-48 bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
-            <div class="w-24 h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-              <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-          </div>
-          <div class="p-6">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-sm font-medium text-blue-600 dark:text-blue-400">Video-Based</span>
-              <span class="text-sm text-gray-500 dark:text-gray-400">4.6 ⭐</span>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Database Design</h3>
-            <p class="text-gray-600 dark:text-gray-400 mb-4">Thiết kế và quản lý cơ sở dữ liệu hiệu quả</p>
-            <div class="flex items-center justify-between">
-              <span class="text-lg font-bold text-green-600 dark:text-green-400">2,800,000 VNĐ</span>
-              <Link 
-                href="/register" 
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
-              >
-                Đăng ký ngay
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        <!-- Course Card 5 -->
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-          <div class="h-48 bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
-            <div class="w-24 h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-              <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-              </svg>
-            </div>
-          </div>
-          <div class="p-6">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-sm font-medium text-blue-600 dark:text-blue-400">Online</span>
-              <span class="text-sm text-gray-500 dark:text-gray-400">4.8 ⭐</span>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Toán học nâng cao</h3>
-            <p class="text-gray-600 dark:text-gray-400 mb-4">Các chủ đề toán học nâng cao cho học sinh THPT</p>
-            <div class="flex items-center justify-between">
-              <span class="text-lg font-bold text-green-600 dark:text-green-400">1,800,000 VNĐ</span>
-              <Link 
-                href="/register" 
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
-              >
-                Đăng ký ngay
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        <!-- Course Card 6 -->
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
-          <div class="h-48 bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center">
-            <div class="w-24 h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center">
-              <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
-              </svg>
-            </div>
-          </div>
-          <div class="p-6">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-sm font-medium text-blue-600 dark:text-blue-400">Offline</span>
-              <span class="text-sm text-gray-500 dark:text-gray-400">4.9 ⭐</span>
-            </div>
-            <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Vật lý ứng dụng</h3>
-            <p class="text-gray-600 dark:text-gray-400 mb-4">Học vật lý qua các thí nghiệm và ứng dụng thực tế</p>
-            <div class="flex items-center justify-between">
-              <span class="text-lg font-bold text-green-600 dark:text-green-400">2,200,000 VNĐ</span>
-              <Link 
-                href="/register" 
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
-              >
-                Đăng ký ngay
-              </Link>
-            </div>
-          </div>
-        </div>
+      </div>
+      
+      <!-- Pagination -->
+      <div v-if="courses.data && courses.data.length > 0" class="mt-8 flex justify-center">
+        <nav class="flex items-center space-x-2">
+          <button 
+            v-for="page in paginationPages" 
+            :key="page"
+            @click="goToPage(page)"
+            :class="[
+              'px-3 py-2 text-sm font-medium rounded-md transition-colors',
+              page === courses.current_page 
+                ? 'bg-blue-600 text-white' 
+                : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-300'
+            ]"
+          >
+            {{ page }}
+          </button>
+        </nav>
       </div>
 
       <!-- Call to Action -->
@@ -287,7 +233,102 @@
 </template>
 
 <script setup>
-import { Link, Head } from '@inertiajs/vue3'
+import { ref, computed } from 'vue'
+import { Link, Head, router } from '@inertiajs/vue3'
+
+// Props
+const props = defineProps({
+  courses: Object,
+  categories: Array,
+  filters: Object
+})
+
+// Reactive data
+const filters = ref({
+  search: props.filters?.search || '',
+  category: props.filters?.category || '',
+  type: props.filters?.type || ''
+})
+
+// Computed
+const paginationPages = computed(() => {
+  if (!props.courses?.last_page) return []
+  
+  const pages = []
+  const current = props.courses.current_page
+  const last = props.courses.last_page
+  
+  // Show first page
+  if (current > 3) {
+    pages.push(1)
+    if (current > 4) pages.push('...')
+  }
+  
+  // Show pages around current
+  for (let i = Math.max(1, current - 2); i <= Math.min(last, current + 2); i++) {
+    pages.push(i)
+  }
+  
+  // Show last page
+  if (current < last - 2) {
+    if (current < last - 3) pages.push('...')
+    pages.push(last)
+  }
+  
+  return pages
+})
+
+// Methods
+const applyFilters = () => {
+  router.get('/courses', filters.value, {
+    preserveState: true,
+    replace: true
+  })
+}
+
+const goToPage = (page) => {
+  if (page === '...') return
+  
+  router.get('/courses', {
+    ...filters.value,
+    page: page
+  }, {
+    preserveState: true,
+    replace: true
+  })
+}
+
+const formatPrice = (price) => {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND'
+  }).format(price)
+}
+
+const handleImageError = (event) => {
+  // Replace broken image with placeholder
+  const img = event.target
+  const courseTitle = img.alt || 'Course'
+  const courseType = img.closest('.course-card')?.dataset.type || 'video'
+  
+  // Generate a simple placeholder
+  const colors = {
+    'video': { bg: '#4F46E5', text: '#FFFFFF' },
+    'zoom': { bg: '#10B981', text: '#FFFFFF' }
+  }
+  
+  const color = colors[courseType] || colors['video']
+  const shortTitle = courseTitle.substring(0, 20)
+  
+  // Create SVG placeholder
+  const svg = `<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg">
+    <rect width="400" height="300" fill="${color.bg}"/>
+    <text x="200" y="150" text-anchor="middle" fill="${color.text}" font-family="Arial, sans-serif" font-size="24" font-weight="bold">${shortTitle}</text>
+    <text x="200" y="180" text-anchor="middle" fill="${color.text}" font-family="Arial, sans-serif" font-size="16" opacity="0.8">${courseType.toUpperCase()} COURSE</text>
+  </svg>`
+  
+  img.src = 'data:image/svg+xml;base64,' + btoa(svg)
+}
 </script>
 
 <style scoped>
@@ -296,5 +337,22 @@ import { Link, Head } from '@inertiajs/vue3'
 
 .handwritten {
   font-family: 'Kalam', cursive;
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 </style>

@@ -130,6 +130,13 @@
                       Sửa
                     </button>
                     <button 
+                      v-if="course.status === 'draft'"
+                      @click="publishCourse(course.id)"
+                      class="text-green-600 hover:text-green-900"
+                    >
+                      Publish
+                    </button>
+                    <button 
                       @click="deleteCourse(course.id)"
                       class="text-red-600 hover:text-red-900"
                     >
@@ -255,6 +262,12 @@ const createCourse = () => {
 
 const editCourse = (courseId) => {
   router.visit(`/admin/courses/${courseId}/edit`)
+}
+
+const publishCourse = (courseId) => {
+  if (confirm('Bạn có chắc chắn muốn phát hành khóa học này?')) {
+    router.patch(`/admin/courses/${courseId}/publish`)
+  }
 }
 
 const deleteCourse = (courseId) => {
