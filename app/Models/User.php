@@ -92,4 +92,36 @@ class User extends Authenticatable
     {
         return $this->role === $role;
     }
+
+    /**
+     * Many-to-many relationship with courses
+     */
+    public function courses()
+    {
+        return $this->belongsToMany(Course::class, 'course_user', 'user_id', 'course_id')
+                    ->withPivot('role', 'enrolled_at')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Courses where this user is a student
+     */
+    public function enrolledCourses()
+    {
+        return $this->belongsToMany(Course::class, 'course_user', 'user_id', 'course_id')
+                    ->wherePivot('role', 'student')
+                    ->withPivot('role', 'enrolled_at')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Courses where this user is a teacher
+     */
+    public function taughtCourses()
+    {
+        return $this->belongsToMany(Course::class, 'course_user', 'user_id', 'course_id')
+                    ->wherePivot('role', 'teacher')
+                    ->withPivot('role', 'enrolled_at')
+                    ->withTimestamps();
+    }
 }

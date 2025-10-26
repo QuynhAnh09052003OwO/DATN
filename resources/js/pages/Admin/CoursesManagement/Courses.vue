@@ -92,7 +92,6 @@
                     </div>
                     <div class="ml-4">
                       <div class="text-sm font-medium text-gray-900">{{ course.title }}</div>
-                      <div class="text-sm text-gray-500">{{ course.description || 'Chưa có mô tả' }}</div>
                     </div>
                   </div>
                 </td>
@@ -294,14 +293,18 @@ const formatDate = (date) => {
 const formatDuration = (duration) => {
   if (!duration) return 'Chưa xác định'
   
-  const hours = Math.floor(duration / 60)
-  const minutes = duration % 60
+  // duration now represents hours directly (e.g., 1.5 = 1 giờ 30 phút)
+  const hours = Math.floor(duration)
+  const decimalPart = duration - hours
+  const minutes = Math.round(decimalPart * 60)
   
-  if (hours > 0) {
+  if (hours > 0 && minutes > 0) {
     return `${hours} giờ ${minutes} phút`
+  } else if (hours > 0) {
+    return `${hours} giờ`
+  } else {
+    return `${minutes} phút`
   }
-  
-  return `${minutes} phút`
 }
 
 onMounted(() => {

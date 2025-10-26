@@ -88,7 +88,7 @@
               <div>
                 <button @click="userMenuOpen = !userMenuOpen" type="button" class="max-w-xs bg-white flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
                   <span class="sr-only">Open user menu</span>
-                  <img class="h-8 w-8 rounded-full" src="https://via.placeholder.com/150/0000FF/FFFFFF?text=Admin" alt="">
+                  <img class="h-8 w-8 rounded-full" :src="adminAvatar" alt="Admin Avatar">
                 </button>
               </div>
 
@@ -117,7 +117,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { Head, Link, usePage } from '@inertiajs/vue3'
 
 const props = defineProps({
@@ -136,6 +136,15 @@ const user = page.props.auth.user
 if (page.url.startsWith('/admin/courses')) {
   coursesMenuOpen.value = true
 }
+
+// Generate admin avatar
+const adminAvatar = computed(() => {
+  const svg = `<svg width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+    <rect width="32" height="32" fill="#3B82F6" rx="16"/>
+    <text x="16" y="20" text-anchor="middle" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="12" font-weight="bold">A</text>
+  </svg>`
+  return 'data:image/svg+xml;base64,' + btoa(svg)
+})
 
 // Methods
 const toggleCoursesMenu = () => {

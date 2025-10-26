@@ -12,7 +12,7 @@ class CourseController extends Controller
 {
     public function index()
     {
-        $courses = Course::with(['category', 'teacher'])
+        $courses = Course::with(['category', 'teachers'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
@@ -26,7 +26,7 @@ class CourseController extends Controller
 
     public function create()
     {
-        // Tạo khóa học mới rỗng với trạng thái draft
+        // Tạo khóa học mới rỗng với trạng thái draft và mặc định bị khóa
         $course = Course::create([
             'title' => 'Khóa học mới',
             'description' => '',
@@ -36,8 +36,7 @@ class CourseController extends Controller
             'category_id' => null,
             'image' => null,
             'duration' => 0,
-            'is_published' => false,
-            'teacher_id' => null,
+            'is_locked' => true, // Mặc định bị khóa
         ]);
 
         // Chuyển hướng tới trang chỉnh sửa
@@ -46,9 +45,12 @@ class CourseController extends Controller
 
     public function edit(Course $course)
     {
-        $course->load(['category', 'teacher']);
+        $course->load(['category', 'teachers']);
         $categories = \App\Models\Category::get(['id', 'name']);
         $teachers = User::where('role', 'teacher')->get(['id', 'name', 'email']);
+        
+        // Get teacher_ids from course_user relationship
+        $course->teacher_ids = $course->teachers->pluck('id')->toArray();
         
         return Inertia::render('Admin/CoursesManagement/CourseEdit', [
             'course' => $course,
@@ -62,27 +64,47 @@ class CourseController extends Controller
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
+            'price' => 'required|numeric|min:0|max:50000000', // Max 50,000,000 VNĐ 
             'type' => 'required|in:video,zoom',
             'category_id' => 'nullable|exists:categories,id',
             'image' => 'nullable|string',
             'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240', // 10MB max
-            'duration' => 'nullable|integer|min:0',
-            'is_published' => 'boolean',
-            'teacher_id' => 'nullable|exists:users,id',
+            'duration' => 'nullable|numeric|min:0',
+            'is_locked' => 'boolean',
+            'teacher_ids' => 'nullable|array',
+            'teacher_ids.*' => 'exists:users,id',
         ]);
 
-        $data = $request->except(['image_file']);
+        $data = $request->except(['image_file', 'teacher_ids']);
 
         // Handle image upload
         if ($request->hasFile('image_file')) {
             $file = $request->file('image_file');
-            $filename = time() . '_' . $file->getClientOriginalName();
+            
+            // Sanitize filename - remove spaces and special characters
+            $originalName = $file->getClientOriginalName();
+            $extension = $file->getClientOriginalExtension();
+            $nameWithoutExt = pathinfo($originalName, PATHINFO_FILENAME);
+            
+            // Replace spaces and special characters with underscores
+            $sanitizedName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $nameWithoutExt);
+            $filename = time() . '_' . $sanitizedName . '.' . $extension;
+            
             $path = $file->storeAs('public/course-images', $filename);
             $data['image'] = asset('storage/course-images/' . $filename);
         }
 
         $course->update($data);
+
+        // Sync teachers to course_user table
+        if ($request->has('teacher_ids') && is_array($request->teacher_ids)) {
+            $teacherIds = array_filter($request->teacher_ids); // Remove empty values
+            $teachers = [];
+            foreach ($teacherIds as $teacherId) {
+                $teachers[$teacherId] = ['role' => 'teacher', 'enrolled_at' => now()];
+            }
+            $course->teachers()->sync($teachers);
+        }
 
         return redirect()->route('admin.courses')
             ->with('success', 'Khóa học đã được cập nhật thành công!');
@@ -91,8 +113,7 @@ class CourseController extends Controller
     public function publish(Course $course)
     {
         $course->update([
-            'status' => 'released',
-            'is_published' => true
+            'status' => 'released'
         ]);
 
         return redirect()->route('admin.courses')

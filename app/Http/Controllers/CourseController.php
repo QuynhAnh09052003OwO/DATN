@@ -11,8 +11,7 @@ class CourseController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Course::with(['category', 'teacher'])
-            ->where('is_published', true)
+        $query = Course::with(['category', 'teachers'])
             ->where('status', 'released');
 
         // Search filter

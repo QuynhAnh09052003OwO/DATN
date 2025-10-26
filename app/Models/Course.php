@@ -16,13 +16,13 @@ class Course extends Model
         'category_id',
         'image',
         'duration',
-        'is_published',
-        'teacher_id',
+        'is_locked',
     ];
 
     protected $casts = [
-        'price' => 'decimal:2',
-        'is_published' => 'boolean',
+        'price' => 'integer', // Store as integer (VNĐ)
+        'duration' => 'decimal:2', // Store as hours (decimal)
+        'is_locked' => 'boolean',
     ];
 
     // Relationships
@@ -31,10 +31,32 @@ class Course extends Model
         return $this->belongsTo(Category::class);
     }
 
-    public function teacher(): BelongsTo
+    // Many-to-many relationship with users
+    public function users()
     {
-        return $this->belongsTo(User::class, 'teacher_id');
+        return $this->belongsToMany(User::class, 'course_user', 'course_id', 'user_id')
+                    ->withPivot('role', 'enrolled_at')
+                    ->withTimestamps();
     }
+
+    // Students enrolled in this course
+    public function students()
+    {
+        return $this->belongsToMany(User::class, 'course_user', 'course_id', 'user_id')
+                    ->wherePivot('role', 'student')
+                    ->withPivot('role', 'enrolled_at')
+                    ->withTimestamps();
+    }
+
+    // Teachers assigned to this course
+    public function teachers()
+    {
+        return $this->belongsToMany(User::class, 'course_user', 'course_id', 'user_id')
+                    ->wherePivot('role', 'teacher')
+                    ->withPivot('role', 'enrolled_at')
+                    ->withTimestamps();
+    }
+
 
     // Scopes
     public function scopeDraft($query)
@@ -47,9 +69,14 @@ class Course extends Model
         return $query->where('status', 'released');
     }
 
-    public function scopePublished($query)
+    public function scopeLocked($query)
     {
-        return $query->where('is_published', true);
+        return $query->where('is_locked', true);
+    }
+    
+    public function scopeUnlocked($query)
+    {
+        return $query->where('is_locked', false);
     }
 
     public function scopeVideo($query)
@@ -82,13 +109,18 @@ class Course extends Model
     {
         if (!$this->duration) return 'Chưa xác định';
         
-        $hours = floor($this->duration / 60);
-        $minutes = $this->duration % 60;
+        // duration now represents hours directly (e.g., 1.5 = 1 giờ 30 phút)
+        $durationValue = (float) $this->duration;
+        $hours = floor($durationValue);
+        $decimalPart = $durationValue - $hours;
+        $minutes = round($decimalPart * 60);
         
-        if ($hours > 0) {
+        if ($hours > 0 && $minutes > 0) {
             return $hours . ' giờ ' . $minutes . ' phút';
+        } elseif ($hours > 0) {
+            return $hours . ' giờ';
+        } else {
+            return $minutes . ' phút';
         }
-        
-        return $minutes . ' phút';
     }
 }

@@ -129,7 +129,7 @@ const updateFormData = (field: string, value: string) => {
                     </div>
                     
                     <div class="grid gap-2">
-                        <Label for="gender">Giới tính <span class="text-red-500">*</span></Label>
+                        <Label for="gender">Giới tính</Label>
                         <select 
                             name="gender" 
                             id="gender"

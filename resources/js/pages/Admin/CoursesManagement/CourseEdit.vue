@@ -67,7 +67,7 @@
 
             <!-- Danh mục -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Danh mục</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Phân loại</label>
               <select
                 v-model="form.category_id"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -90,6 +90,8 @@
                   :src="imagePreview" 
                   alt="Preview" 
                   class="w-32 h-32 object-cover rounded-lg border border-gray-300"
+                  @error="handleImageError"
+                  @load="handleImageLoad"
                 />
                 <button 
                   @click="removeImage"
@@ -166,7 +168,7 @@
                 v-model.number="form.price"
                 type="number"
                 min="0"
-                step="1000"
+                max="50000000"
                 required
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="0"
@@ -174,47 +176,78 @@
               <div v-if="errors.price" class="mt-1 text-sm text-red-600">{{ errors.price }}</div>
             </div>
 
-            <!-- Thời lượng -->
+            <!-- Số giờ học -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Thời lượng (phút)</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Số giờ học</label>
               <input
                 v-model.number="form.duration"
                 type="number"
                 min="0"
+                step="0.5"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="0"
               />
               <div v-if="errors.duration" class="mt-1 text-sm text-red-600">{{ errors.duration }}</div>
+              <p class="mt-1 text-sm text-gray-500">Ví dụ: 1.5 = 1 giờ 30 phút, 2.0 = 2 giờ</p>
             </div>
 
-            <!-- Giáo viên -->
+            <!-- Giảng viên phụ trách -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Giáo viên</label>
-              <select
-                v-model="form.teacher_id"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              >
-                <option value="">Chọn giáo viên</option>
-                <option v-for="teacher in teachers" :key="teacher.id" :value="teacher.id">
-                  {{ teacher.name }} ({{ teacher.email }})
-                </option>
-              </select>
-              <div v-if="errors.teacher_id" class="mt-1 text-sm text-red-600">{{ errors.teacher_id }}</div>
-            </div>
-
-            <!-- Đã xuất bản -->
-            <div class="md:col-span-2">
-              <div class="flex items-center">
-                <input
-                  v-model="form.is_published"
-                  type="checkbox"
-                  class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                />
-                <label class="ml-2 block text-sm text-gray-900">
-                  Đã xuất bản
-                </label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Giảng viên phụ trách</label>
+              
+              <!-- Dropdown -->
+              <div class="relative">
+                <button
+                  @click="showTeacherDropdown = !showTeacherDropdown"
+                  type="button"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-left flex items-center justify-between"
+                >
+                  <span class="text-gray-700">
+                    {{ selectedTeachers.length > 0 ? `${selectedTeachers.length} giảng viên đã chọn` : 'Chọn giảng viên' }}
+                  </span>
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </button>
+                
+                <!-- Dropdown menu -->
+                <div v-if="showTeacherDropdown" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <div class="p-2">
+                    <div v-for="teacher in teachers" :key="teacher.id" class="flex items-center px-3 py-2 hover:bg-gray-50 rounded">
+                      <input
+                        :id="`teacher-${teacher.id}`"
+                        type="checkbox"
+                        :checked="form.teacher_ids && form.teacher_ids.includes(teacher.id)"
+                        @change="toggleTeacher(teacher.id)"
+                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <label :for="`teacher-${teacher.id}`" class="ml-2 text-sm text-gray-700 cursor-pointer flex-1">
+                        {{ teacher.name }} ({{ teacher.email }})
+                      </label>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div v-if="errors.is_published" class="mt-1 text-sm text-red-600">{{ errors.is_published }}</div>
+              
+              <!-- Selected teachers display -->
+              <div v-if="selectedTeachers.length > 0" class="mt-2 flex flex-wrap gap-2">
+                <span
+                  v-for="teacher in selectedTeachers"
+                  :key="teacher.id"
+                  class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800"
+                >
+                  {{ teacher.name }}
+                  <button
+                    @click="removeTeacher(teacher.id)"
+                    type="button"
+                    class="ml-2 text-blue-600 hover:text-blue-800"
+                  >
+                    ×
+                  </button>
+                </span>
+              </div>
+              
+              <div v-if="errors.teacher_id" class="mt-1 text-sm text-red-600">{{ errors.teacher_id }}</div>
             </div>
           </div>
         </div>
@@ -242,7 +275,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
 import AdminLayout from '@/layouts/AdminLayout.vue'
 
@@ -258,6 +291,7 @@ const isSubmitting = ref(false)
 const errors = ref({})
 const imagePreview = ref('')
 const selectedFile = ref(null)
+const showTeacherDropdown = ref(false)
 
 const form = reactive({
   title: props.course?.title || '',
@@ -268,8 +302,34 @@ const form = reactive({
   price: props.course?.price || 0,
   duration: props.course?.duration || 0,
   is_published: props.course?.is_published || false,
-  teacher_id: props.course?.teacher_id || null
+  teacher_ids: props.course?.teacher_ids || [] // Array of teacher IDs
 })
+
+// Computed for selected teachers display
+const selectedTeachers = computed(() => {
+  if (!form.teacher_ids || !Array.isArray(form.teacher_ids)) return []
+  return props.teachers.filter(teacher => form.teacher_ids.includes(teacher.id))
+})
+
+// Methods for teacher selection
+const toggleTeacher = (teacherId) => {
+  if (!form.teacher_ids) form.teacher_ids = []
+  
+  const index = form.teacher_ids.indexOf(teacherId)
+  if (index > -1) {
+    form.teacher_ids.splice(index, 1)
+  } else {
+    form.teacher_ids.push(teacherId)
+  }
+}
+
+const removeTeacher = (teacherId) => {
+  if (!form.teacher_ids) return
+  const index = form.teacher_ids.indexOf(teacherId)
+  if (index > -1) {
+    form.teacher_ids.splice(index, 1)
+  }
+}
 
 // Methods
 const handleFileSelect = (event) => {
@@ -320,9 +380,40 @@ const removeImage = () => {
   }
 }
 
+const handleImageError = (event) => {
+  console.error('Image load error:', event.target.src)
+  
+  // Try to use a placeholder instead
+  if (imagePreview.value && !imagePreview.value.startsWith('data:')) {
+    // If it's a URL that failed, try to create a placeholder
+    const svg = `<svg width="150" height="150" xmlns="http://www.w3.org/2000/svg">
+      <rect width="150" height="150" fill="#9CA3AF"/>
+      <text x="75" y="80" text-anchor="middle" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="14" font-weight="bold">Image not found</text>
+    </svg>`
+    imagePreview.value = 'data:image/svg+xml;base64,' + btoa(svg)
+  } else {
+    // Clear if we can't use placeholder
+    imagePreview.value = ''
+    form.image = ''
+  }
+}
+
+const handleImageLoad = (event) => {
+  console.log('Image loaded successfully:', event.target.src)
+}
+
 const updateCourse = async () => {
   isSubmitting.value = true
   errors.value = {}
+
+  // Validate price range
+  if (form.price < 0 || form.price > 50000000) {
+    errors.value = {
+      price: 'Giá phải nằm trong khoảng từ 0 đến 50,000,000 VNĐ'
+    }
+    isSubmitting.value = false
+    return
+  }
 
   try {
     // Create FormData for file upload
@@ -366,6 +457,9 @@ const goBack = () => {
 onMounted(() => {
   // Initialize form with course data
   if (props.course) {
+    // Get teacher_ids from course (now using course_user table)
+    const teacherIds = props.course.teacher_ids || []
+    
     Object.assign(form, {
       title: props.course.title || '',
       description: props.course.description || '',
@@ -375,7 +469,7 @@ onMounted(() => {
       price: props.course.price || 0,
       duration: props.course.duration || 0,
       is_published: props.course.is_published || false,
-      teacher_id: props.course.teacher_id || null
+      teacher_ids: teacherIds
     })
     
     // Set image preview if course has image
@@ -383,5 +477,12 @@ onMounted(() => {
       imagePreview.value = props.course.image
     }
   }
+  
+  // Close dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.relative')) {
+      showTeacherDropdown.value = false
+    }
+  })
 })
 </script>
