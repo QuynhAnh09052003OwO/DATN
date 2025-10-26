@@ -71,12 +71,36 @@
             </Link>
           </div>
         </div>
-        <Link href="/admin/teachers" :class="{'bg-blue-100 text-blue-700': $page.url.startsWith('/admin/teachers'), 'text-gray-600 hover:bg-gray-50 hover:text-gray-900': !$page.url.startsWith('/admin/teachers')}" class="mt-1 flex items-center px-4 py-2 text-sm font-medium rounded-md">
-          <svg class="mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-          </svg>
-          Quản lý giáo viên
-        </Link>
+        <!-- Quản lý giáo viên - Menu cha -->
+        <div class="mt-1">
+          <button @click="toggleTeachersMenu" class="w-full flex items-center justify-between px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">
+            <div class="flex items-center">
+              <svg class="mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+              </svg>
+              Quản lý giáo viên
+            </div>
+            <svg class="h-4 w-4 transition-transform duration-200" :class="{'rotate-90': teachersMenuOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+          </button>
+          
+          <!-- Menu con -->
+          <div v-show="teachersMenuOpen" class="ml-6 space-y-1">
+            <Link href="/admin/teachers" :class="{'bg-blue-100 text-blue-700': $page.url === '/admin/teachers', 'text-gray-600 hover:bg-gray-50 hover:text-gray-900': $page.url !== '/admin/teachers'}" class="flex items-center px-4 py-2 text-sm font-medium rounded-md">
+              <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+              Danh sách giáo viên
+            </Link>
+            <Link href="/admin/teachers/create" :class="{'bg-blue-100 text-blue-700': $page.url === '/admin/teachers/create', 'text-gray-600 hover:bg-gray-50 hover:text-gray-900': $page.url !== '/admin/teachers/create'}" class="flex items-center px-4 py-2 text-sm font-medium rounded-md">
+              <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+              </svg>
+              Tạo tài khoản giáo viên
+            </Link>
+          </div>
+        </div>
         <Link href="/admin/students" :class="{'bg-blue-100 text-blue-700': $page.url.startsWith('/admin/students'), 'text-gray-600 hover:bg-gray-50 hover:text-gray-900': !$page.url.startsWith('/admin/students')}" class="mt-1 flex items-center px-4 py-2 text-sm font-medium rounded-md">
           <svg class="mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
@@ -145,6 +169,7 @@ const props = defineProps({
 const sidebarOpen = ref(false)
 const userMenuOpen = ref(false)
 const coursesMenuOpen = ref(false)
+const teachersMenuOpen = ref(false)
 
 const page = usePage()
 const user = page.props.auth.user
@@ -152,6 +177,11 @@ const user = page.props.auth.user
 // Auto-open courses menu if on courses pages
 if (page.url.startsWith('/admin/courses')) {
   coursesMenuOpen.value = true
+}
+
+// Auto-open teachers menu if on teachers pages
+if (page.url.startsWith('/admin/teachers')) {
+  teachersMenuOpen.value = true
 }
 
 // Generate admin avatar
@@ -166,5 +196,9 @@ const adminAvatar = computed(() => {
 // Methods
 const toggleCoursesMenu = () => {
   coursesMenuOpen.value = !coursesMenuOpen.value
+}
+
+const toggleTeachersMenu = () => {
+  teachersMenuOpen.value = !teachersMenuOpen.value
 }
 </script>

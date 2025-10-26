@@ -19,7 +19,7 @@
             </div>
             <div class="ml-4">
               <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Tổng khóa học</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white">24</p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ stats.totalCourses }}</p>
             </div>
           </div>
         </div>
@@ -34,7 +34,7 @@
             </div>
             <div class="ml-4">
               <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Khóa học hoạt động</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white">18</p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ stats.activeCourses }}</p>
             </div>
           </div>
         </div>
@@ -49,7 +49,7 @@
             </div>
             <div class="ml-4">
               <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Học sinh đăng ký</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white">1,234</p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ stats.totalStudents }}</p>
             </div>
           </div>
         </div>
@@ -64,7 +64,7 @@
             </div>
             <div class="ml-4">
               <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Giáo viên</p>
-              <p class="text-2xl font-semibold text-gray-900 dark:text-white">12</p>
+              <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ stats.totalTeachers }}</p>
             </div>
           </div>
         </div>
@@ -141,4 +141,16 @@ import { usePage } from '@inertiajs/vue3'
 
 const page = usePage()
 const user = page.props.auth.user
+const props = defineProps({
+  stats: {
+    type: Object,
+    required: true,
+    default: () => ({
+      totalCourses: 0,
+      activeCourses: 0,
+      totalStudents: 0,
+      totalTeachers: 0,
+    })
+  }
+})
 </script>

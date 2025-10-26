@@ -78,15 +78,15 @@
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
-              <tr v-for="teacher in teachers" :key="teacher.id" class="hover:bg-gray-50">
+              <tr v-for="teacher in teachers_list" :key="teacher.id" class="hover:bg-gray-50">
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="flex items-center">
                     <div class="flex-shrink-0 h-10 w-10">
-                      <img class="h-10 w-10 rounded-full" :src="teacher.avatar" :alt="teacher.name">
+                      <img class="h-10 w-10 rounded-full" :src="generateAvatar(teacher.name)" :alt="teacher.name">
                     </div>
                     <div class="ml-4">
                       <div class="text-sm font-medium text-gray-900">{{ teacher.name }}</div>
-                      <div class="text-sm text-gray-500">{{ teacher.phone }}</div>
+                      <div class="text-sm text-gray-500">{{ teacher.phone || 'N/A' }}</div>
                     </div>
                   </div>
                 </td>
@@ -94,23 +94,21 @@
                   <div class="text-sm text-gray-900">{{ teacher.email }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ teacher.subject }}</div>
+                  <div class="text-sm text-gray-900">{{ teacher.subject || 'N/A' }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ teacher.courses }}</div>
+                  <div class="text-sm text-gray-900">{{ teacher.courses_count || 0 }}</div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span :class="[
                     'inline-flex px-2 py-1 text-xs font-semibold rounded-full',
-                    teacher.status === 'active' ? 'bg-green-100 text-green-800' : 
-                    teacher.status === 'inactive' ? 'bg-red-100 text-red-800' : 
-                    'bg-yellow-100 text-yellow-800'
+                    'bg-green-100 text-green-800'
                   ]">
-                    {{ teacher.statusText }}
+                    Đang hoạt động
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {{ teacher.createdAt }}
+                  {{ formatDate(teacher.created_at) }}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <div class="flex space-x-2">
@@ -164,9 +162,28 @@
 
 <script setup>
 import AdminLayout from '@/layouts/AdminLayout.vue'
+import { ref } from 'vue'
+
+const generateAvatar = (name, color = '#3B82F6') => {
+  const initials = name.split(' ').map(n => n[0]).join('').toUpperCase()
+  const svg = `<svg width="150" height="150" xmlns="http://www.w3.org/2000/svg">
+    <rect width="150" height="150" fill="${color}"/>
+    <text x="75" y="80" text-anchor="middle" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="48" font-weight="bold">${initials}</text>
+  </svg>`
+  return 'data:image/svg+xml;base64,' + btoa(svg)
+}
+
+// Props từ backend
+const props = defineProps({
+  teachers: {
+    type: Array,
+    required: true,
+    default: () => []
+  }
+})
 
 // Sample data - sẽ được thay thế bằng data từ API
-const teachers = [
+const teachers_list = props.teachers.length > 0 ? props.teachers : [
   {
     id: 1,
     name: 'Nguyễn Văn A',
@@ -216,4 +233,11 @@ const teachers = [
     createdAt: '05/01/2024'
   }
 ]
+
+// Format date
+const formatDate = (date) => {
+  if (!date) return 'N/A'
+  const d = new Date(date)
+  return d.toLocaleDateString('vi-VN')
+}
 </script>

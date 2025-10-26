@@ -337,9 +337,7 @@ Route::get('dashboard', function () {
 
 // Admin routes - chỉ admin mới có thể truy cập
 Route::middleware(['auth', 'ensure.role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('Admin/Dashboard');
-    })->name('dashboard');
+    Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
     
     // Courses routes
     Route::get('/courses', [\App\Http\Controllers\Admin\CourseController::class, 'index'])->name('courses');
@@ -357,9 +355,9 @@ Route::middleware(['auth', 'ensure.role:admin'])->prefix('admin')->name('admin.'
     Route::put('/courses/categories/{category}', [\App\Http\Controllers\Admin\CategoryController::class, 'update'])->name('courses.categories.update');
     Route::delete('/courses/categories/{category}', [\App\Http\Controllers\Admin\CategoryController::class, 'destroy'])->name('courses.categories.destroy');
     
-    Route::get('/teachers', function () {
-        return Inertia::render('Admin/Teachers');
-    })->name('teachers');
+    Route::get('/teachers', [\App\Http\Controllers\Admin\TeacherController::class, 'index'])->name('teachers');
+    Route::get('/teachers/create', [\App\Http\Controllers\Admin\TeacherController::class, 'create'])->name('teachers.create');
+    Route::post('/teachers', [\App\Http\Controllers\Admin\TeacherController::class, 'store'])->name('teachers.store');
     
     Route::get('/students', function () {
         return Inertia::render('Admin/Students');
