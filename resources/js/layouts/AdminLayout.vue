@@ -1,197 +1,37 @@
-<template>
-  <div class="min-h-screen bg-blue-50">
-    <Head :title="title" />
-    
-    <!-- Sidebar -->
-    <div class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out" :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'">
-      <!-- Logo -->
-      <div class="flex items-center justify-center h-16 px-4 bg-blue-600">
-        <div class="flex items-center space-x-2">
-          <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-            <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M5 16L3 8l5.5 5L12 4l3.5 9L21 8l-2 8H5zm2.7-2h8.6l.9-4.4L14 12l-2-5.5L10 12l-3.2-2.4L7.7 14z"/>
-            </svg>
-          </div>
-          <span class="text-xl font-bold text-white">DoraEdu Admin</span>
-        </div>
-      </div>
-
-      <!-- Navigation -->
-      <nav class="mt-5">
-        <Link href="/admin" :class="{'bg-blue-100 text-blue-700': $page.url.startsWith('/admin') && $page.url === '/admin', 'text-gray-600 hover:bg-gray-50 hover:text-gray-900': !($page.url.startsWith('/admin') && $page.url === '/admin')}" class="flex items-center px-4 py-2 text-sm font-medium rounded-md">
-          <svg class="mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-          </svg>
-          Tổng quan
-        </Link>
-        
-        <!-- Quay về trang chủ -->
-        <Link href="/" :class="{'bg-blue-100 text-blue-700': $page.url === '/', 'text-gray-600 hover:bg-gray-50 hover:text-gray-900': $page.url !== '/'}" class="mt-1 flex items-center px-4 py-2 text-sm font-medium rounded-md">
-          <svg class="mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-          </svg>
-          Trang chủ
-        </Link>
-        
-        <!-- Khóa học -->
-        <Link href="/courses" :class="{'bg-blue-100 text-blue-700': $page.url === '/courses', 'text-gray-600 hover:bg-gray-50 hover:text-gray-900': $page.url !== '/courses'}" class="mt-1 flex items-center px-4 py-2 text-sm font-medium rounded-md">
-          <svg class="mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-          </svg>
-          Khóa học
-        </Link>
-        
-        <!-- Quản lý khóa học - Menu cha -->
-        <div class="mt-1">
-          <button @click="toggleCoursesMenu" class="w-full flex items-center justify-between px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">
-            <div class="flex items-center">
-              <svg class="mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-              </svg>
-              Quản lý khóa học
-            </div>
-            <svg class="h-4 w-4 transition-transform duration-200" :class="{'rotate-90': coursesMenuOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-          </button>
-          
-          <!-- Menu con -->
-          <div v-show="coursesMenuOpen" class="ml-6 space-y-1">
-            <Link href="/admin/courses" :class="{'bg-blue-100 text-blue-700': $page.url === '/admin/courses', 'text-gray-600 hover:bg-gray-50 hover:text-gray-900': $page.url !== '/admin/courses'}" class="flex items-center px-4 py-2 text-sm font-medium rounded-md">
-              <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-              </svg>
-              Danh sách khóa học
-            </Link>
-            <Link href="/admin/courses/categories" :class="{'bg-blue-100 text-blue-700': $page.url.startsWith('/admin/courses/categories'), 'text-gray-600 hover:bg-gray-50 hover:text-gray-900': !$page.url.startsWith('/admin/courses/categories')}" class="flex items-center px-4 py-2 text-sm font-medium rounded-md">
-              <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
-              </svg>
-              Phân loại khóa học
-            </Link>
-          </div>
-        </div>
-        <!-- Quản lý giáo viên - Menu cha -->
-        <div class="mt-1">
-          <button @click="toggleTeachersMenu" class="w-full flex items-center justify-between px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50 hover:text-gray-900 rounded-md">
-            <div class="flex items-center">
-              <svg class="mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-              </svg>
-              Quản lý giáo viên
-            </div>
-            <svg class="h-4 w-4 transition-transform duration-200" :class="{'rotate-90': teachersMenuOpen}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-          </button>
-          
-          <!-- Menu con -->
-          <div v-show="teachersMenuOpen" class="ml-6 space-y-1">
-            <Link href="/admin/teachers" :class="{'bg-blue-100 text-blue-700': $page.url === '/admin/teachers', 'text-gray-600 hover:bg-gray-50 hover:text-gray-900': $page.url !== '/admin/teachers'}" class="flex items-center px-4 py-2 text-sm font-medium rounded-md">
-              <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-              </svg>
-              Danh sách giáo viên
-            </Link>
-            <Link href="/admin/teachers/create" :class="{'bg-blue-100 text-blue-700': $page.url === '/admin/teachers/create', 'text-gray-600 hover:bg-gray-50 hover:text-gray-900': $page.url !== '/admin/teachers/create'}" class="flex items-center px-4 py-2 text-sm font-medium rounded-md">
-              <svg class="mr-3 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-              </svg>
-              Tạo tài khoản giáo viên
-            </Link>
-          </div>
-        </div>
-        <Link href="/admin/students" :class="{'bg-blue-100 text-blue-700': $page.url.startsWith('/admin/students'), 'text-gray-600 hover:bg-gray-50 hover:text-gray-900': !$page.url.startsWith('/admin/students')}" class="mt-1 flex items-center px-4 py-2 text-sm font-medium rounded-md">
-          <svg class="mr-3 h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"></path>
-          </svg>
-          Quản lý học sinh
-        </Link>
-      </nav>
-    </div>
-
-    <!-- Main content area -->
-    <div class="lg:pl-64 flex flex-col flex-1">
-      <!-- Top bar -->
-      <div class="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white shadow-sm">
-        <button @click="sidebarOpen = !sidebarOpen" class="px-4 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 lg:hidden">
-          <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-          </svg>
-        </button>
-        <div class="flex-1 px-4 flex justify-between">
-          <div class="flex-1 flex items-center">
-            <h1 class="text-2xl font-semibold text-gray-900">{{ pageTitle }}</h1>
-          </div>
-          <div class="ml-4 flex items-center md:ml-6">
-            <!-- User dropdown -->
-            <div class="ml-3 relative">
-              <div>
-                <button @click="userMenuOpen = !userMenuOpen" type="button" class="max-w-xs bg-white flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" id="user-menu-button" aria-expanded="false" aria-haspopup="true">
-                  <span class="sr-only">Open user menu</span>
-                  <img class="h-8 w-8 rounded-full" :src="adminAvatar" alt="Admin Avatar">
-                </button>
-              </div>
-
-              <div v-if="userMenuOpen" @click.away="userMenuOpen = false" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button">
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Your Profile</a>
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Settings</a>
-                <Link href="/logout" method="post" as="button" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-                  Đăng xuất
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <main class="flex-1">
-        <div class="py-6">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <!-- Content goes here -->
-            <slot />
-          </div>
-        </div>
-      </main>
-    </div>
-  </div>
-</template>
-
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { Head, Link, usePage } from '@inertiajs/vue3'
+import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, SidebarTrigger } from '@/components/ui/sidebar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
+import { Button } from '@/components/ui/button'
+import Breadcrumbs from '@/components/Breadcrumbs.vue'
+import { getInitials } from '@/composables/useInitials'
+import { Home, BookOpen, Users, GraduationCap, User, LogOut } from 'lucide-vue-next'
 
 const props = defineProps({
   title: String,
   pageTitle: String,
+  breadcrumbs: {
+    type: Array,
+    default: () => [],
+  },
 })
 
-const sidebarOpen = ref(false)
-const userMenuOpen = ref(false)
 const coursesMenuOpen = ref(false)
 const teachersMenuOpen = ref(false)
 
 const page = usePage()
 const user = page.props.auth.user
 
-// Auto-open courses menu if on courses pages
+// Auto-open menus based on current route
 if (page.url.startsWith('/admin/courses')) {
   coursesMenuOpen.value = true
 }
 
-// Auto-open teachers menu if on teachers pages
 if (page.url.startsWith('/admin/teachers')) {
   teachersMenuOpen.value = true
 }
-
-// Generate admin avatar
-const adminAvatar = computed(() => {
-  const svg = `<svg width="32" height="32" xmlns="http://www.w3.org/2000/svg">
-    <rect width="32" height="32" fill="#3B82F6" rx="16"/>
-    <text x="16" y="20" text-anchor="middle" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="12" font-weight="bold">A</text>
-  </svg>`
-  return 'data:image/svg+xml;base64,' + btoa(svg)
-})
 
 // Methods
 const toggleCoursesMenu = () => {
@@ -202,3 +42,179 @@ const toggleTeachersMenu = () => {
   teachersMenuOpen.value = !teachersMenuOpen.value
 }
 </script>
+
+<template>
+  <SidebarProvider>
+    <Head :title="title" />
+    
+    <div class="flex min-h-screen w-full">
+      <!-- Sidebar -->
+      <Sidebar collapsible="icon" variant="inset" class="border-r">
+        <SidebarHeader class="bg-blue-600">
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton size="lg" as-child>
+                <Link href="/admin">
+                  <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+                      <svg class="w-5 h-5 text-blue-600" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M5 16L3 8l5.5 5L12 4l3.5 9L21 8l-2 8H5zm2.7-2h8.6l.9-4.4L14 12l-2-5.5L10 12l-3.2-2.4L7.7 14z"/>
+                      </svg>
+                    </div>
+                    <span class="text-xl font-bold text-white">DoraEdu Admin</span>
+                  </div>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarHeader>
+
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <!-- Tổng quan -->
+              <SidebarMenuItem>
+                <SidebarMenuButton :is-active="page.url === '/admin'" as-child>
+                  <Link href="/admin">
+                    <Home class="mr-2 h-4 w-4" />
+                    <span>Tổng quan</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              <!-- Trang chủ -->
+              <SidebarMenuItem>
+                <SidebarMenuButton :is-active="page.url === '/'" as-child>
+                  <Link href="/">
+                    <Home class="mr-2 h-4 w-4" />
+                    <span>Trang chủ</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              <!-- Khóa học -->
+              <SidebarMenuItem>
+                <SidebarMenuButton :is-active="page.url === '/courses'" as-child>
+                  <Link href="/courses">
+                    <BookOpen class="mr-2 h-4 w-4" />
+                    <span>Khóa học</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+
+              <!-- Quản lý khóa học -->
+              <SidebarMenuItem>
+                <!-- <SidebarMenuSub> -->
+                  <SidebarMenuSubButton @click="toggleCoursesMenu">
+                    <BookOpen class="mr-2 h-4 w-4" />
+                    <span>Quản lý khóa học</span>
+                  </SidebarMenuSubButton>
+                  <SidebarMenuSub v-show="coursesMenuOpen">
+                    <SidebarMenuButton :is-active="page.url === '/admin/courses'" as-child>
+                      <Link href="/admin/courses">
+                        <span>Danh sách khóa học</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuSub>
+                  <SidebarMenuSub v-show="coursesMenuOpen">
+                    <SidebarMenuButton :is-active="page.url.startsWith('/admin/courses/categories')" as-child>
+                      <Link href="/admin/courses/categories">
+                        <span>Phân loại khóa học</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuSub>
+                <!-- </SidebarMenuSub> -->
+              </SidebarMenuItem>
+
+              <!-- Quản lý giáo viên -->
+              <SidebarMenuItem>
+                <!-- <SidebarMenuSub> -->
+                  <SidebarMenuSubButton @click="toggleTeachersMenu">
+                    <GraduationCap class="mr-2 h-4 w-4" />
+                    <span>Quản lý giáo viên</span>
+                  </SidebarMenuSubButton>
+                  <SidebarMenuSub v-show="teachersMenuOpen">
+                    <SidebarMenuButton :is-active="page.url === '/admin/teachers'" as-child>
+                      <Link href="/admin/teachers">
+                        <span>Danh sách giáo viên</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuSub>
+                  <SidebarMenuSub v-show="teachersMenuOpen">
+                    <SidebarMenuButton :is-active="page.url === '/admin/teachers/create'" as-child>
+                      <Link href="/admin/teachers/create">
+                        <span>Tạo tài khoản giáo viên</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuSub>
+                <!-- </SidebarMenuSub> -->
+              </SidebarMenuItem>
+
+              <!-- Quản lý học sinh -->
+              <SidebarMenuItem>
+                <SidebarMenuButton :is-active="page.url.startsWith('/admin/students')" as-child>
+                  <Link href="/admin/students">
+                    <Users class="mr-2 h-4 w-4" />
+                    <span>Quản lý học sinh</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+
+        <SidebarFooter>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <DropdownMenu>
+                <DropdownMenuTrigger as-child>
+                  <SidebarMenuButton class="w-full justify-start">
+                    <Avatar class="h-8 w-8 rounded-full mr-2">
+                      <AvatarFallback class="bg-blue-600 text-white">
+                        {{ getInitials(user?.name) }}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div class="flex flex-col items-start text-left">
+                      <span class="text-sm font-medium">{{ user?.name }}</span>
+                      <span class="text-xs text-muted-foreground">Administrator</span>
+                    </div>
+                  </SidebarMenuButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" class="w-56">
+                  <DropdownMenuItem>
+                    <User class="mr-2 h-4 w-4" />
+                    <span>Profile</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <span>Settings</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem as-child>
+                    <Link href="/logout" method="post">
+                      <LogOut class="mr-2 h-4 w-4" />
+                      <span>Đăng xuất</span>
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+      </Sidebar>
+
+      <!-- Main content area -->
+      <div class="flex-1 flex flex-col">
+        <header class="h-16 border-b flex items-center gap-2 px-6">
+          <SidebarTrigger />
+          <h1 class="text-2xl font-semibold">{{ pageTitle }}</h1>
+        </header>
+        
+        <main class="flex-1 overflow-auto">
+          <div class="p-6">
+            <slot />
+          </div>
+        </main>
+      </div>
+    </div>
+  </SidebarProvider>
+</template>
