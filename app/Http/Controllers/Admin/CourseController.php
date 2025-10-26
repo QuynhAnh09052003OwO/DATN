@@ -90,7 +90,7 @@ class CourseController extends Controller
             $sanitizedName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $nameWithoutExt);
             $filename = time() . '_' . $sanitizedName . '.' . $extension;
             
-            $path = $file->storeAs('public/course-images', $filename);
+            $path = $file->storeAs('course-images', $filename, 'public');
             $data['image'] = asset('storage/course-images/' . $filename);
         }
 

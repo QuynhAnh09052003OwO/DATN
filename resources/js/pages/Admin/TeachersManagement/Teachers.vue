@@ -4,7 +4,7 @@
       <!-- Header Actions -->
       <div class="flex justify-between items-center">
         <div>
-          <h2 class="text-2xl font-bold text-gray-900">Quản lý giáo viên</h2>
+          <h2 class="text-2xl font-bold text-gray-900">Danh sách giáo viên</h2>
           <p class="text-gray-600">Quản lý tài khoản và thông tin giáo viên</p>
         </div>
         <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
@@ -61,10 +61,7 @@
                   Email
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Môn học
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Khóa học
+                  Khóa học phụ trách
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Trạng thái
@@ -93,11 +90,15 @@
                 <td class="px-6 py-4 whitespace-nowrap">
                   <div class="text-sm text-gray-900">{{ teacher.email }}</div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ teacher.subject || 'N/A' }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ teacher.courses_count || 0 }}</div>
+                <td class="px-6 py-4">
+                  <div class="text-sm text-gray-900">
+                    <div v-if="teacher.courses && teacher.courses.length > 0">
+                      <div v-for="(course, index) in teacher.courses" :key="index" class="mb-1">
+                        {{ course }}
+                      </div>
+                    </div>
+                    <div v-else class="text-gray-400">Chưa có khóa học</div>
+                  </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span :class="[

@@ -18,6 +18,7 @@ class TeacherController extends Controller
     {
         $teachers = User::where('role', 'teacher')
             ->withCount('taughtCourses')
+            ->with('taughtCourses:id,title')
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($teacher) {
@@ -28,6 +29,7 @@ class TeacherController extends Controller
                     'phone' => $teacher->phone ?? 'N/A',
                     'gender' => $teacher->gender ?? 'N/A',
                     'courses_count' => $teacher->taught_courses_count ?? 0,
+                    'courses' => $teacher->taughtCourses->pluck('title')->toArray(),
                     'created_at' => $teacher->created_at->toDateString(),
                 ];
             });
