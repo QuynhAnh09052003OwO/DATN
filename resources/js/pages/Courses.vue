@@ -1,53 +1,6 @@
 <template>
-  <div class="min-h-screen bg-blue-50">
-    <Head title="Khóa học - DoraEdu" />
-    
-    <!-- Header -->
-    <header class="bg-white shadow-sm">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16">
-          <!-- Logo and Navigation -->
-          <div class="flex items-center space-x-8">
-            <!-- Logo -->
-            <div class="flex items-center space-x-2">
-              <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-sm">
-                <svg class="w-6 h-6 text-yellow-500" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M5 16L3 8l5.5 5L12 4l3.5 9L21 8l-2 8H5zm2.7-2h8.6l.9-4.4L14 12l-2-5.5L10 12l-3.2-2.4L7.7 14z"/>
-                </svg>
-              </div>
-              <span class="text-2xl font-bold text-blue-800">DoraEdu</span>
-            </div>
-            
-            <!-- Navigation Links -->
-            <nav class="hidden md:flex space-x-6">
-              <Link href="#" class="text-blue-800 font-semibold hover:text-blue-600 transition-colors underline">VỀ DORAEDU</Link>
-              <Link href="/courses" class="text-blue-800 font-semibold hover:text-blue-600 transition-colors underline">KHÓA HỌC</Link>
-              <Link href="#" class="text-blue-800 font-semibold hover:text-blue-600 transition-colors underline">SÁCH</Link>
-              <Link href="#" class="text-blue-800 font-semibold hover:text-blue-600 transition-colors underline">FLASHCARD</Link>
-            </nav>
-          </div>
-
-          <!-- Auth Buttons -->
-          <div class="flex items-center space-x-4">
-            <Link 
-              href="/login" 
-              class="text-blue-800 font-semibold hover:text-blue-600 transition-colors border border-blue-800 px-4 py-2 rounded-lg"
-            >
-              Đăng nhập
-            </Link>
-            <Link 
-              href="/register" 
-              class="bg-blue-800 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-900 transition-colors"
-            >
-              Đăng ký
-            </Link>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <PublicLayout title="Khóa học - DoraEdu">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <!-- Page Header -->
       <div class="text-center mb-12">
         <h1 class="text-4xl font-bold text-gray-900 mb-4">
@@ -228,13 +181,14 @@
           </div>
         </div>
       </div>
-    </main>
-  </div>
+    </div>
+  </PublicLayout>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
-import { Link, Head, router } from '@inertiajs/vue3'
+import { Link, router } from '@inertiajs/vue3'
+import PublicLayout from '@/layouts/PublicLayout.vue'
 
 // Props
 const props = defineProps({
