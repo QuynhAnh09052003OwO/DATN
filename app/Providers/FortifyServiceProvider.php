@@ -83,13 +83,13 @@ class FortifyServiceProvider extends ServiceProvider
                     case 'teacher':
                         return redirect()->route('teacher.dashboard');
                     case 'student':
-                        return redirect()->route('student.dashboard');
+                        return redirect('/'); // Redirect to Home page instead of student dashboard
                     default:
                         return redirect()->route('dashboard');
                 }
             }
             
-            return redirect()->route('dashboard');
+            return redirect('/');
         });
     }
 

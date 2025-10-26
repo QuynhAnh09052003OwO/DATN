@@ -28,9 +28,9 @@ class RedirectAfterLogin
             case 'teacher':
                 return '/teacher';
             case 'student':
-                return '/student';
+                return '/'; // Redirect to Home page instead of student dashboard
             default:
-                return '/dashboard';
+                return '/';
         }
     }
 }
