@@ -5,7 +5,7 @@ import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import AuthBase from '@/layouts/AuthLayout.vue';
 // import { login } from '@/routes';
 import { store } from '@/routes/register';
@@ -71,13 +71,13 @@ const updateFormData = (field: string, value: string) => {
         <Head title="Đăng ký - DoraEdu" />
         
         <!-- Left Side - Branding and Welcome Message -->
-        <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-50 to-indigo-100 flex-col justify-center items-center px-12">
+        <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-50 to-blue-100 flex-col justify-center items-center px-12">
             <div class="max-w-4xl text-center">
                 <!-- Logo -->
                 <div class="flex justify-center mb-8">
-                    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-lg">
-                        <div class="w-12 h-12 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
-                            <svg class="w-8 h-8 text-white" viewBox="0 0 24 24" fill="currentColor">
+                    <div class="w-48 h-48 bg-white rounded-full flex items-center justify-center shadow-lg">
+                        <div class="w-36 h-36 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+                            <svg class="w-24 h-24 text-white" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M5 16L3 8l5.5 5L12 4l3.5 9L21 8l-2 8H5zm2.7-2h8.6l.9-4.4L14 12l-2-5.5L10 12l-3.2-2.4L7.7 14z"/>
                             </svg>
                         </div>
@@ -130,17 +130,16 @@ const updateFormData = (field: string, value: string) => {
                     
                     <div class="grid gap-2">
                         <Label for="gender">Giới tính</Label>
-                        <select 
-                            name="gender" 
-                            id="gender"
-                            class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                            :tabindex="2"
-                        >
-                            <option value="">Chọn giới tính</option>
-                            <option value="male">Nam</option>
-                            <option value="female">Nữ</option>
-                            <option value="other">Khác</option>
-                        </select>
+                        <Select name="gender" :default-value="''">
+                            <SelectTrigger id="gender" :tabindex="2">
+                                <SelectValue placeholder="Chọn giới tính" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="male">Nam</SelectItem>
+                                <SelectItem value="female">Nữ</SelectItem>
+                                <SelectItem value="other">Khác</SelectItem>
+                            </SelectContent>
+                        </Select>
                         <InputError :message="errors.gender" />
                     </div>
                 </div>
@@ -183,19 +182,20 @@ const updateFormData = (field: string, value: string) => {
                             autocomplete="new-password"
                             name="password"
                             placeholder="Nhập mật khẩu"
-                            class="pr-10"
+                            class="pr-10 text-xl"
+                            style="letter-spacing: 0.125em;"
                         />
                         <button
                             type="button"
                             @click="showPassword = !showPassword"
                             class="absolute inset-y-0 right-0 pr-3 flex items-center"
                         >
-                            <svg v-if="!showPassword" class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            <svg v-if="!showPassword" class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                             </svg>
-                            <svg v-else class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                            <svg v-else class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
                             </svg>
                         </button>
                     </div>
@@ -213,19 +213,20 @@ const updateFormData = (field: string, value: string) => {
                             autocomplete="new-password"
                             name="password_confirmation"
                             placeholder="Nhập lại mật khẩu"
-                            class="pr-10"
+                            class="pr-10 text-xl"
+                            style="letter-spacing: 0.125em;"
                         />
                         <button
                             type="button"
                             @click="showPasswordConfirmation = !showPasswordConfirmation"
                             class="absolute inset-y-0 right-0 pr-3 flex items-center"
                         >
-                            <svg v-if="!showPasswordConfirmation" class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                            <svg v-if="!showPasswordConfirmation" class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                             </svg>
-                            <svg v-else class="h-4 w-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
+                            <svg v-else class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"></path>
                             </svg>
                         </button>
                     </div>
@@ -255,7 +256,7 @@ const updateFormData = (field: string, value: string) => {
 
                     <Button
                         type="submit"
-                        class="mt-2 w-full"
+                        class="mt-2 w-full bg-blue-600 hover:bg-blue-700"
                         tabindex="7"
                         :disabled="processing"
                         data-test="register-user-button"
@@ -272,7 +273,6 @@ const updateFormData = (field: string, value: string) => {
                 Đã có tài khoản?
                 <TextLink
                     href="/login"
-                    class="underline underline-offset-4"
                     :tabindex="8"
                     >Đăng nhập</TextLink
                 >

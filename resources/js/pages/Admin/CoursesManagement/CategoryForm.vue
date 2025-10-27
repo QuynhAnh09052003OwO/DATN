@@ -25,14 +25,13 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Tên danh mục -->
             <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
+              <Label>
                 Tên danh mục <span class="text-red-500">*</span>
-              </label>
-              <input
+              </Label>
+              <Input
                 v-model="form.name"
                 type="text"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Nhập tên danh mục"
               />
               <div v-if="errors.name" class="mt-1 text-sm text-red-600">{{ errors.name }}</div>
@@ -40,11 +39,11 @@
 
             <!-- Mô tả -->
             <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Mô tả</label>
+              <Label>Mô tả</Label>
               <textarea
                 v-model="form.description"
                 rows="3"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                 placeholder="Nhập mô tả danh mục"
               ></textarea>
               <div v-if="errors.description" class="mt-1 text-sm text-red-600">{{ errors.description }}</div>
@@ -52,18 +51,18 @@
 
             <!-- Màu sắc -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Màu sắc</label>
+              <Label>Màu sắc</Label>
               <div class="flex items-center space-x-4">
                 <input
                   v-model="form.color"
                   type="color"
                   class="h-10 w-20 border border-gray-300 rounded-lg cursor-pointer"
                 />
-                <input
+                <Input
                   v-model="form.color"
                   type="text"
-                  class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="#3B82F6"
+                  class="flex-1"
                 />
               </div>
               <div v-if="errors.color" class="mt-1 text-sm text-red-600">{{ errors.color }}</div>
@@ -71,7 +70,7 @@
 
             <!-- Trạng thái -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Trạng thái</label>
+              <Label>Trạng thái</Label>
               <div class="flex items-center">
                 <input
                   v-model="form.is_active"
@@ -128,6 +127,9 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
 import AdminLayout from '@/layouts/AdminLayout.vue'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 // Props
 const props = defineProps({

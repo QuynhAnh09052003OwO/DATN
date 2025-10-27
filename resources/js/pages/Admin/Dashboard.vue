@@ -21,8 +21,8 @@
         <Card>
           <CardHeader>
             <div class="flex items-center justify-between">
-              <div class="p-3 rounded-full bg-blue-100 dark:bg-blue-900">
-                <BookOpen class="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              <div class="p-3 rounded-full bg-blue-100">
+                <BookOpen class="h-6 w-6 text-blue-600" />
               </div>
             </div>
             <CardTitle class="text-sm font-medium text-muted-foreground">Tổng khóa học</CardTitle>
@@ -36,8 +36,8 @@
         <Card>
           <CardHeader>
             <div class="flex items-center justify-between">
-              <div class="p-3 rounded-full bg-green-100 dark:bg-green-900">
-                <CheckCircle class="h-6 w-6 text-green-600 dark:text-green-400" />
+              <div class="p-3 rounded-full bg-green-100">
+                <CheckCircle class="h-6 w-6 text-green-600" />
               </div>
             </div>
             <CardTitle class="text-sm font-medium text-muted-foreground">Khóa học hoạt động</CardTitle>
@@ -51,8 +51,8 @@
         <Card>
           <CardHeader>
             <div class="flex items-center justify-between">
-              <div class="p-3 rounded-full bg-yellow-100 dark:bg-yellow-900">
-                <Users class="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
+              <div class="p-3 rounded-full bg-yellow-100">
+                <Users class="h-6 w-6 text-yellow-600" />
               </div>
             </div>
             <CardTitle class="text-sm font-medium text-muted-foreground">Học sinh đăng ký</CardTitle>
@@ -66,8 +66,8 @@
         <Card>
           <CardHeader>
             <div class="flex items-center justify-between">
-              <div class="p-3 rounded-full bg-purple-100 dark:bg-purple-900">
-                <GraduationCap class="h-6 w-6 text-purple-600 dark:text-purple-400" />
+              <div class="p-3 rounded-full bg-purple-100">
+                <GraduationCap class="h-6 w-6 text-purple-600" />
               </div>
             </div>
             <CardTitle class="text-sm font-medium text-muted-foreground">Giáo viên</CardTitle>

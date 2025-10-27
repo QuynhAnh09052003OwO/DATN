@@ -23,14 +23,13 @@
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Tên khóa học -->
             <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">
+              <Label>
                 Tên khóa học <span class="text-red-500">*</span>
-              </label>
-              <input
+              </Label>
+              <Input
                 v-model="form.title"
                 type="text"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Nhập tên khóa học"
               />
               <div v-if="errors.title" class="mt-1 text-sm text-red-600">{{ errors.title }}</div>
@@ -38,11 +37,11 @@
 
             <!-- Mô tả -->
             <div class="md:col-span-2">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Mô tả</label>
+              <Label>Mô tả</Label>
               <textarea
                 v-model="form.description"
                 rows="4"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
                 placeholder="Nhập mô tả khóa học"
               ></textarea>
               <div v-if="errors.description" class="mt-1 text-sm text-red-600">{{ errors.description }}</div>
@@ -50,13 +49,13 @@
 
             <!-- Loại khóa học -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
+              <Label>
                 Loại khóa học <span class="text-red-500">*</span>
-              </label>
+              </Label>
               <select
                 v-model="form.type"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
               >
                 <option value="video">Video (Record sẵn)</option>
                 <option value="zoom">Zoom (Học trực tiếp)</option>
@@ -67,10 +66,10 @@
 
             <!-- Danh mục -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Phân loại</label>
+              <Label>Phân loại</Label>
               <select
                 v-model="form.category_id"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
               >
                 <option value="">Chọn danh mục</option>
                 <option v-for="category in categories" :key="category.id" :value="category.id">
@@ -82,7 +81,7 @@
 
             <!-- Hình ảnh -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Hình ảnh</label>
+              <Label>Hình ảnh</Label>
               
               <!-- Image Preview -->
               <div v-if="imagePreview" class="mb-4">
@@ -147,11 +146,10 @@
               
               <!-- URL Input (Alternative) -->
               <div class="mt-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">Hoặc nhập URL ảnh</label>
-                <input
+                <Label>Hoặc nhập URL ảnh</Label>
+                <Input
                   v-model="form.image"
                   type="url"
-                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="https://example.com/image.jpg"
                 />
               </div>
@@ -161,16 +159,15 @@
 
             <!-- Giá -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">
+              <Label>
                 Giá (VNĐ) <span class="text-red-500">*</span>
-              </label>
-              <input
+              </Label>
+              <Input
                 v-model.number="form.price"
                 type="number"
                 min="0"
                 max="50000000"
                 required
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="0"
               />
               <div v-if="errors.price" class="mt-1 text-sm text-red-600">{{ errors.price }}</div>
@@ -178,13 +175,12 @@
 
             <!-- Số giờ học -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Số giờ học</label>
-              <input
+              <Label>Số giờ học</Label>
+              <Input
                 v-model.number="form.duration"
                 type="number"
                 min="0"
                 step="0.5"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="0"
               />
               <div v-if="errors.duration" class="mt-1 text-sm text-red-600">{{ errors.duration }}</div>
@@ -193,7 +189,7 @@
 
             <!-- Giảng viên phụ trách -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Giảng viên phụ trách</label>
+              <Label>Giảng viên phụ trách</Label>
               
               <!-- Dropdown -->
               <div class="relative">
@@ -278,6 +274,9 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { router } from '@inertiajs/vue3'
 import AdminLayout from '@/layouts/AdminLayout.vue'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 // Props
 const props = defineProps({
