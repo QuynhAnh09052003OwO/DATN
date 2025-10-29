@@ -222,6 +222,7 @@
                       </label>
                     </div>
                   </div>
+
                 </div>
               </div>
               
@@ -247,6 +248,122 @@
             </div>
           </div>
         </div>
+
+        <!-- Quản lý học phần -->
+        <Card class="mt-6">
+          <CardHeader>
+            <CardTitle>Danh sách học phần</CardTitle>
+            <CardDescription>Quản lý các học phần thuộc khóa học này. Có thể chỉnh sửa tiêu đề, mô tả từng học phần, cũng như thêm mới.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div v-for="(section, sIdx) in sections" :key="section.id" class="mb-6 border p-4 rounded-xl bg-muted/40">
+              <div class="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
+                <Label :for="`section-title-${sIdx}`" class="font-semibold mb-1 md:mb-0">Học phần {{ sIdx + 1 }}</Label>
+                <Input :id="`section-title-${sIdx}`" v-model="section.title" placeholder="Nhập tiêu đề học phần" class="flex-1 mb-1 md:mb-0" />
+                <Button variant="ghost" size="sm" class="text-red-500" @click="removeSection(sIdx)">Xóa</Button>
+              </div>
+            <div class="mt-3">
+                <Label :for="`section-desc-${sIdx}`">Mô tả bài học</Label>
+                <textarea :id="`section-desc-${sIdx}`" v-model="section.description" class="w-full rounded-lg border p-2 mt-1" rows="2" placeholder="Thêm mô tả."></textarea>
+              </div>
+
+
+              <!-- Danh sách bài học trong học phần -->
+              <div v-for="(lesson, lIdx) in section.lessons" :key="lesson.id" class="mb-4 rounded-xl border p-4 bg-white">
+                <div class="flex flex-col gap-3">
+                  <div class="flex flex-col md:flex-row md:items-center md:gap-4">
+                    <Label :for="`lesson-title-${sIdx}-${lIdx}`" class="font-medium mb-1 md:mb-0">Bài {{ lIdx + 1 }}</Label>
+                    <Input :id="`lesson-title-${sIdx}-${lIdx}`" v-model="lesson.title" placeholder="Nhập tiêu đề bài học" class="flex-1" />
+                    <button type="button" class="text-red-600 px-3 py-1" @click="removeLesson(sIdx, lIdx)">Xóa</button>
+                  </div>
+
+                  <div>
+                    <Label :for="`lesson-desc-${sIdx}-${lIdx}`">Mô tả bài học</Label>
+                    <textarea :id="`lesson-desc-${sIdx}-${lIdx}`" v-model="lesson.description" class="w-full rounded-lg border p-2 mt-1" rows="3" placeholder="Thêm mô tả."></textarea>
+                  </div>
+
+                  <!-- Tài liệu học: giao diện giống upload ảnh của course -->
+                  <div class="mt-2">
+                    <Label>Tài liệu học</Label>
+                    <div
+                      class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors mt-1"
+                    >
+                      <!-- Tiles -->
+                      <div class="grid grid-cols-2 gap-6 max-w-md mx-auto">
+                        <!-- Video tile -->
+                        <label class="cursor-pointer group">
+                          <input type="file" class="hidden" accept="video/*" @change="e => onLessonVideoFileChange(sIdx, lIdx, e)" />
+                          <div class="flex flex-col items-center justify-center rounded-lg border border-gray-300 p-4 group-hover:border-gray-400">
+                            <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14" />
+                              <rect x="3" y="6" width="12" height="12" rx="2" ry="2"></rect>
+                            </svg>
+                            <span class="mt-2 text-sm text-gray-700">Video</span>
+                          </div>
+                        </label>
+
+                        <!-- Attachment tile -->
+                        <label class="cursor-pointer group">
+                          <input type="file" class="hidden" accept="application/pdf" @change="e => onLessonAttachmentChange(sIdx, lIdx, e)" />
+                          <div class="flex flex-col items-center justify-center rounded-lg border border-gray-300 p-4 group-hover:border-gray-400">
+                            <svg class="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H9m12 0A9 9 0 113 12a9 9 0 0118 0z" />
+                            </svg>
+                            <span class="mt-2 text-sm text-gray-700">Attachment</span>
+                          </div>
+                        </label>
+                      </div>
+
+                      <!-- Selected previews/info -->
+                      <div class="mt-4 space-y-2 text-sm text-gray-700">
+                        <div v-if="lesson.videoName" class="flex items-center justify-center gap-2">
+                          <span>Video đã chọn:</span>
+                          <span class="font-medium">{{ lesson.videoName }}</span>
+                          <button type="button" class="text-blue-600 hover:text-blue-800" @click="clearLessonVideo(sIdx, lIdx)">Gỡ</button>
+                        </div>
+                        <div v-if="lesson.attachmentName" class="flex items-center justify-center gap-2">
+                          <span>PDF đã chọn:</span>
+                          <span class="font-medium">{{ lesson.attachmentName }}</span>
+                          <button type="button" class="text-blue-600 hover:text-blue-800" @click="clearLessonAttachment(sIdx, lIdx)">Gỡ</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            <!-- Actions: Thêm bài học / bài kiểm tra -->
+            <div class="mt-4 border-t pt-4">
+              <div class="flex items-center gap-3 mb-4">
+                <button type="button" @click="addLesson(sIdx)" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                  <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                  </svg>
+                  Thêm bài học
+                </button>
+                <button type="button" @click="addQuiz(sIdx)" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+                  + Thêm bài kiểm tra
+                </button>
+              </div>
+            </div>
+
+            <!-- Section actions INSIDE the section card -->
+            <div class="mt-4 flex justify-end gap-3">
+              <button type="button" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors" @click="resetSection(sIdx)">Hủy</button>
+              <button type="button" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" @click="saveSection(sIdx)">Lưu học phần</button>
+            </div>
+
+            </div>
+            <div class="flex">
+              <button type="button" @click="addSection" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                </svg>
+                Học phần
+              </button>
+            </div>
+          </CardContent>
+        </Card>
 
         <!-- Actions -->
         <div class="flex justify-end space-x-4">
@@ -277,6 +394,8 @@ import AdminLayout from '@/layouts/AdminLayout.vue'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
 
 // Props
 const props = defineProps({
@@ -309,6 +428,105 @@ const selectedTeachers = computed(() => {
   if (!form.teacher_ids || !Array.isArray(form.teacher_ids)) return []
   return props.teachers.filter(teacher => form.teacher_ids.includes(teacher.id))
 })
+
+// Học phần - sectionsList
+const sections = ref([
+  // Có thể thay rỗng [] nếu data server chưa có
+  // {id: 1, title: 'Giới thiệu', description: 'Mở đầu khóa học', lessons: []},
+])
+
+function addSection() {
+  sections.value.push({
+    id: Date.now() + Math.floor(Math.random() * 10000),
+    title: '',
+    description: '',
+    lessons: []
+  })
+}
+
+function removeSection(idx) {
+  sections.value.splice(idx, 1)
+}
+
+// Lessons
+function addLesson(sectionIdx) {
+  const section = sections.value[sectionIdx]
+  if (!section.lessons) section.lessons = []
+  section.lessons.push({
+    id: Date.now() + Math.floor(Math.random() * 10000),
+    title: '',
+    description: '',
+    videoFile: null,
+    videoName: '',
+    attachmentFile: null,
+    attachmentName: ''
+  })
+}
+
+function removeLesson(sectionIdx, lessonIdx) {
+  const section = sections.value[sectionIdx]
+  if (!section?.lessons) return
+  section.lessons.splice(lessonIdx, 1)
+}
+
+function onLessonAttachmentChange(sectionIdx, lessonIdx, event) {
+  const file = event?.target?.files?.[0]
+  if (!file) return
+  const lesson = sections.value[sectionIdx]?.lessons?.[lessonIdx]
+  if (!lesson) return
+  lesson.attachmentFile = file
+  lesson.attachmentName = file.name
+}
+
+function onLessonVideoFileChange(sectionIdx, lessonIdx, event) {
+  const file = event?.target?.files?.[0]
+  if (!file) return
+  const lesson = sections.value[sectionIdx]?.lessons?.[lessonIdx]
+  if (!lesson) return
+  lesson.videoFile = file
+  lesson.videoName = file.name
+}
+
+function clearLessonVideo(sectionIdx, lessonIdx) {
+  const lesson = sections.value[sectionIdx]?.lessons?.[lessonIdx]
+  if (!lesson) return
+  lesson.videoFile = null
+  lesson.videoName = ''
+}
+
+function clearLessonAttachment(sectionIdx, lessonIdx) {
+  const lesson = sections.value[sectionIdx]?.lessons?.[lessonIdx]
+  if (!lesson) return
+  lesson.attachmentFile = null
+  lesson.attachmentName = ''
+}
+
+// Save/Reset section (client-side placeholder)
+function saveSection(sectionIdx) {
+  const section = sections.value[sectionIdx]
+  if (!section) return
+  // Basic validation
+  if (!section.title || section.title.trim().length === 0) {
+    alert(`Vui lòng nhập tiêu đề cho học phần #${sectionIdx + 1}`)
+    return
+  }
+  // You can integrate API call here to persist this section only
+  console.log('Saving section', JSON.parse(JSON.stringify(section)))
+  alert('Học phần đã được lưu (demo client-side).')
+}
+
+function resetSection(sectionIdx) {
+  const section = sections.value[sectionIdx]
+  if (!section) return
+  section.title = ''
+  section.description = ''
+  section.lessons = []
+}
+
+function addQuiz(sectionIdx) {
+  // Placeholder: có thể mở modal/inline form trong tương lai
+  alert('Thêm bài kiểm tra: Sẽ triển khai logic lưu/hiển thị chi tiết sau.')
+}
 
 // Methods for teacher selection
 const toggleTeacher = (teacherId) => {
