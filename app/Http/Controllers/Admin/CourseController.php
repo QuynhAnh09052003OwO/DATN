@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\User;
+use App\Models\Section;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -126,5 +127,33 @@ class CourseController extends Controller
 
         return redirect()->route('admin.courses')
             ->with('success', 'Khóa học đã được xóa thành công!');
+    }
+
+    // JSON: fetch sections with lessons for a course
+    public function sectionsJson(Course $course)
+    {
+        $course->load(['sections.lessons']);
+        return response()->json([
+            'sections' => $course->sections->map(function ($s) {
+                return [
+                    'id' => $s->id,
+                    'title' => $s->title,
+                    'order' => $s->order,
+                    'description' => $s->description ?? null,
+                    'lessons' => $s->lessons->map(function ($l) {
+                        return [
+                            'id' => $l->id,
+                            'title' => $l->title,
+                            'description' => $l->description,
+                            'attachment' => $l->attachment,
+                            'video_url' => $l->video_url,
+                            'video_duration' => $l->video_duration,
+                            'order' => $l->order,
+                            'is_locked' => (bool) $l->is_locked,
+                        ];
+                    }),
+                ];
+            }),
+        ]);
     }
 }

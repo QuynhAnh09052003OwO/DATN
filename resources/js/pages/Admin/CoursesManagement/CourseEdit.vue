@@ -1,6 +1,12 @@
 <template>
   <AdminLayout title="Chỉnh sửa khóa học - Admin" page-title="Chỉnh sửa khóa học">
     <div class="space-y-6">
+      <!-- Toast success -->
+      <transition name="fade">
+        <div v-if="toast.show" class="fixed right-6 bottom-6 z-50 rounded-lg bg-green-600 text-white px-4 py-2 shadow-lg">
+          {{ toast.message }}
+        </div>
+      </transition>
       <!-- Header -->
       <div class="flex justify-between items-center">
         <div>
@@ -260,7 +266,7 @@
               <div class="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
                 <Label :for="`section-title-${sIdx}`" class="font-semibold mb-1 md:mb-0">Học phần {{ sIdx + 1 }}</Label>
                 <Input :id="`section-title-${sIdx}`" v-model="section.title" placeholder="Nhập tiêu đề học phần" class="flex-1 mb-1 md:mb-0" />
-                <Button variant="ghost" size="sm" class="text-red-500" @click="removeSection(sIdx)">Xóa</Button>
+                <Button type="button" variant="ghost" size="sm" class="text-red-500" @click.stop.prevent="removeSection(sIdx)">Xóa</Button>
               </div>
             <div class="mt-3">
                 <Label :for="`section-desc-${sIdx}`">Mô tả bài học</Label>
@@ -274,7 +280,7 @@
                   <div class="flex flex-col md:flex-row md:items-center md:gap-4">
                     <Label :for="`lesson-title-${sIdx}-${lIdx}`" class="font-medium mb-1 md:mb-0">Bài {{ lIdx + 1 }}</Label>
                     <Input :id="`lesson-title-${sIdx}-${lIdx}`" v-model="lesson.title" placeholder="Nhập tiêu đề bài học" class="flex-1" />
-                    <button type="button" class="text-red-600 px-3 py-1" @click="removeLesson(sIdx, lIdx)">Xóa</button>
+                    <button type="button" class="text-red-600 px-3 py-1" @click.stop.prevent="removeLesson(sIdx, lIdx)">Xóa</button>
                   </div>
 
                   <div>
@@ -379,7 +385,7 @@
             :disabled="isSubmitting"
             class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
           >
-            {{ isSubmitting ? 'Đang lưu...' : 'Lưu thay đổi' }}
+            {{ isSubmitting ? 'Đang lưu...' : 'Lưu khóa học' }}
           </button>
         </div>
       </form>
@@ -410,6 +416,14 @@ const errors = ref({})
 const imagePreview = ref('')
 const selectedFile = ref(null)
 const showTeacherDropdown = ref(false)
+
+// Toast
+const toast = reactive({ show: false, message: '' })
+function showSuccess(msg) {
+  toast.message = msg
+  toast.show = true
+  setTimeout(() => { toast.show = false }, 2000)
+}
 
 const form = reactive({
   title: props.course?.title || '',
@@ -444,8 +458,26 @@ function addSection() {
   })
 }
 
-function removeSection(idx) {
-  sections.value.splice(idx, 1)
+async function removeSection(idx) {
+  const section = sections.value[idx]
+  if (!section) return
+  if (!confirm('Bạn có chắc muốn xóa học phần này?')) return
+  if (section.serverId || section.id) {
+    const id = section.serverId || section.id
+    const resp = await fetch(`/admin/sections/${id}`, {
+      method: 'DELETE',
+      headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '') },
+      credentials: 'same-origin'
+    })
+    if (!resp.ok) {
+      alert('Xóa học phần thất bại. Mã lỗi: ' + resp.status)
+      return
+    }
+    await loadSections()
+    showSuccess('Đã xóa học phần')
+  } else {
+    sections.value.splice(idx, 1)
+  }
 }
 
 // Lessons
@@ -463,10 +495,27 @@ function addLesson(sectionIdx) {
   })
 }
 
-function removeLesson(sectionIdx, lessonIdx) {
+async function removeLesson(sectionIdx, lessonIdx) {
   const section = sections.value[sectionIdx]
   if (!section?.lessons) return
-  section.lessons.splice(lessonIdx, 1)
+  const lesson = section.lessons[lessonIdx]
+  if (!lesson) return
+  if (!confirm('Bạn có chắc muốn xóa bài học này?')) return
+  if (lesson.id) {
+    const resp = await fetch(`/admin/lessons/${lesson.id}`, {
+      method: 'DELETE',
+      headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '') },
+      credentials: 'same-origin'
+    })
+    if (!resp.ok) {
+      alert('Xóa bài học thất bại. Mã lỗi: ' + resp.status)
+      return
+    }
+    await loadSections()
+    showSuccess('Đã xóa bài học')
+  } else {
+    section.lessons.splice(lessonIdx, 1)
+  }
 }
 
 function onLessonAttachmentChange(sectionIdx, lessonIdx, event) {
@@ -510,9 +559,78 @@ function saveSection(sectionIdx) {
     alert(`Vui lòng nhập tiêu đề cho học phần #${sectionIdx + 1}`)
     return
   }
-  // You can integrate API call here to persist this section only
-  console.log('Saving section', JSON.parse(JSON.stringify(section)))
-  alert('Học phần đã được lưu (demo client-side).')
+  // Create or update section, then upsert lessons
+  const payload = {
+    title: section.title,
+    order: section.order ?? sectionIdx + 1
+  }
+  const isUpdate = !!section.serverId
+  const sectionUrl = isUpdate
+    ? `/admin/sections/${section.serverId}/json`
+    : `/admin/courses/${props.course.id}/sections-json`
+  const sectionMethod = isUpdate ? 'PUT' : 'POST'
+  fetch(sectionUrl, {
+    method: sectionMethod,
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '')
+    },
+    credentials: 'same-origin',
+    body: JSON.stringify(payload)
+  }).then(async r => {
+    if (!r.ok) {
+      if (r.status === 422) {
+        const err = await r.json().catch(() => ({}))
+        console.error('Validation error (section)', err)
+        showSuccess('Không thể lưu học phần: thiếu tiêu đề hoặc dữ liệu không hợp lệ')
+        throw new Error('422')
+      }
+    }
+    return r.json()
+  }).then(async (data) => {
+    const sectionId = data?.section?.id
+    if (!sectionId) return
+    section.serverId = sectionId
+    // Save or update lessons sequentially
+    for (let lIdx = 0; lIdx < (section.lessons?.length || 0); lIdx++) {
+      const lesson = section.lessons[lIdx]
+      const fd = new FormData()
+      const safeTitle = (lesson.title && lesson.title.trim().length > 0) ? lesson.title : `Bài ${lIdx + 1}`
+      fd.append('title', safeTitle)
+      if (lesson.description) fd.append('description', lesson.description)
+      if (lesson.videoFile) fd.append('video_file', lesson.videoFile)
+      if (lesson.attachmentFile) fd.append('attachment', lesson.attachmentFile)
+      if (typeof lesson.order !== 'undefined') fd.append('order', String(lesson.order))
+      if (typeof lesson.videoDuration !== 'undefined') fd.append('video_duration', String(lesson.videoDuration))
+      const lessonIdNum = Number(lesson.id)
+      const isLessonUpdate = Number.isFinite(lessonIdNum) && lessonIdNum > 0
+      const lessonUrl = isLessonUpdate ? `/admin/lessons/${lessonIdNum}/json` : `/admin/sections/${sectionId}/lessons-json`
+      const lessonMethod = isLessonUpdate ? 'PUT' : 'POST'
+      const resp = await fetch(lessonUrl, {
+        method: lessonMethod,
+        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '') },
+        credentials: 'same-origin',
+        body: fd
+      })
+      if (!resp.ok) {
+        if (resp.status === 422) {
+          const err = await resp.json().catch(() => ({}))
+          console.error('Validation error (lesson)', err)
+          alert('Không thể lưu bài học: thiếu tiêu đề hoặc tệp không hợp lệ/kích thước quá lớn.')
+        } else {
+          alert('Không thể lưu bài học. Mã lỗi: ' + resp.status)
+        }
+        return
+      }
+    }
+    // Reload sections from DB and re-bind
+    await loadSections()
+    showSuccess('Đã lưu học phần và bài học')
+  }).catch(() => {
+    alert('Không thể lưu học phần. Vui lòng thử lại.')
+  })
 }
 
 function resetSection(sectionIdx) {
@@ -524,8 +642,43 @@ function resetSection(sectionIdx) {
 }
 
 function addQuiz(sectionIdx) {
-  // Placeholder: có thể mở modal/inline form trong tương lai
-  alert('Thêm bài kiểm tra: Sẽ triển khai logic lưu/hiển thị chi tiết sau.')
+  const section = sections.value[sectionIdx]
+  if (!section?.serverId) {
+    showSuccess('Vui lòng lưu học phần trước khi tạo bài kiểm tra')
+    return
+  }
+  router.visit(`/admin/courses/${props.course.id}/sections/${section.serverId}/tests/create`)
+}
+
+// Load sections from server and bind to local state
+async function loadSections() {
+  try {
+    const res = await fetch(`/admin/courses/${props.course.id}/sections-json`, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    const data = await res.json()
+    const mapped = (data.sections || []).map(s => ({
+      id: s.id,
+      serverId: s.id,
+      title: s.title,
+      description: s.description || '',
+      order: s.order,
+      lessons: (s.lessons || []).map(l => ({
+        id: l.id,
+        title: l.title,
+        description: l.description || '',
+        videoFile: null,
+        videoName: l.video_url ? l.video_url.split('/').pop() : '',
+        attachmentFile: null,
+        attachmentName: l.attachment ? l.attachment.split('/').pop() : '',
+        order: l.order,
+        videoDuration: l.video_duration || 0
+      }))
+    }))
+    sections.value = mapped
+  } catch (e) {
+    console.error('Failed to load sections', e)
+  }
 }
 
 // Methods for teacher selection
@@ -701,5 +854,8 @@ onMounted(() => {
       showTeacherDropdown.value = false
     }
   })
+
+  // Load sections from server initially
+  loadSections()
 })
 </script>

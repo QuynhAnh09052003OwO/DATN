@@ -66,7 +66,7 @@ Route::get('/login/admin', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         // Redirect based on user role
-        $user = auth()->user();
+        $user = request()->user();
         
         if ($user) {
             return match($user->role) {
@@ -111,6 +111,23 @@ Route::middleware(['auth', 'ensure.role:admin'])->prefix('admin')->name('admin.'
     Route::get('/teachers', [\App\Http\Controllers\Admin\TeacherController::class, 'index'])->name('teachers');
     Route::get('/teachers/create', [\App\Http\Controllers\Admin\TeacherController::class, 'create'])->name('teachers.create');
     Route::post('/teachers', [\App\Http\Controllers\Admin\TeacherController::class, 'store'])->name('teachers.store');
+
+    // Course Sections & Lessons
+    Route::get('/courses/{course}/sections-json', [\App\Http\Controllers\Admin\CourseController::class, 'sectionsJson'])->name('courses.sectionsJson');
+    Route::post('/courses/{course}/sections', [\App\Http\Controllers\Admin\SectionController::class, 'store'])->name('sections.store');
+    Route::post('/courses/{course}/sections-json', [\App\Http\Controllers\Admin\SectionController::class, 'storeJson'])->name('sections.storeJson');
+    Route::put('/sections/{section}/json', [\App\Http\Controllers\Admin\SectionController::class, 'updateJson'])->name('sections.updateJson');
+    Route::put('/sections/{section}', [\App\Http\Controllers\Admin\SectionController::class, 'update'])->name('sections.update');
+    Route::delete('/sections/{section}', [\App\Http\Controllers\Admin\SectionController::class, 'destroy'])->name('sections.destroy');
+
+    Route::post('/sections/{section}/lessons', [\App\Http\Controllers\Admin\LessonController::class, 'store'])->name('lessons.store');
+    Route::post('/sections/{section}/lessons-json', [\App\Http\Controllers\Admin\LessonController::class, 'storeJson'])->name('lessons.storeJson');
+    Route::put('/lessons/{lesson}/json', [\App\Http\Controllers\Admin\LessonController::class, 'updateJson'])->name('lessons.updateJson');
+
+    // Tests Management (create page)
+    Route::get('/courses/{course}/sections/{section}/tests/create', [\App\Http\Controllers\Admin\TestController::class, 'create'])->name('tests.create');
+    Route::put('/lessons/{lesson}', [\App\Http\Controllers\Admin\LessonController::class, 'update'])->name('lessons.update');
+    Route::delete('/lessons/{lesson}', [\App\Http\Controllers\Admin\LessonController::class, 'destroy'])->name('lessons.destroy');
     
     // Students Management
     Route::get('/students', function () {
