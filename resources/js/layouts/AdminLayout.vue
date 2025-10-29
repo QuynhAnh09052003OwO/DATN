@@ -7,7 +7,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Button } from '@/components/ui/button'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { getInitials } from '@/composables/useInitials'
-import { Home, BookOpen, Users, GraduationCap, User, LogOut } from 'lucide-vue-next'
+import { Home, BookOpen, Users, GraduationCap, User, LogOut, ChevronRight, ChevronDown } from 'lucide-vue-next'
 
 const props = defineProps({
   title: String,
@@ -20,6 +20,7 @@ const props = defineProps({
 
 const coursesMenuOpen = ref(false)
 const teachersMenuOpen = ref(false)
+const studentsMenuOpen = ref(false)
 
 const page = usePage()
 const user = page.props.auth.user
@@ -33,6 +34,10 @@ if (page.url.startsWith('/admin/teachers')) {
   teachersMenuOpen.value = true
 }
 
+if (page.url.startsWith('/admin/students')) {
+  studentsMenuOpen.value = true
+}
+
 // Methods
 const toggleCoursesMenu = () => {
   coursesMenuOpen.value = !coursesMenuOpen.value
@@ -40,6 +45,10 @@ const toggleCoursesMenu = () => {
 
 const toggleTeachersMenu = () => {
   teachersMenuOpen.value = !teachersMenuOpen.value
+}
+
+const toggleStudentsMenu = () => {
+  studentsMenuOpen.value = !studentsMenuOpen.value
 }
 </script>
 
@@ -108,6 +117,10 @@ const toggleTeachersMenu = () => {
                   <SidebarMenuSubButton @click="toggleCoursesMenu">
                     <BookOpen class="mr-2 h-4 w-4" />
                     <span>Quản lý khóa học</span>
+                    <span class="ml-auto flex items-center">
+                      <ChevronDown v-if="coursesMenuOpen" class="h-4 w-4 transition-transform" />
+                      <ChevronRight v-else class="h-4 w-4 transition-transform" />
+                    </span>
                   </SidebarMenuSubButton>
                   <SidebarMenuSub v-show="coursesMenuOpen">
                     <SidebarMenuButton :is-active="page.url === '/admin/courses'" as-child>
@@ -132,6 +145,10 @@ const toggleTeachersMenu = () => {
                   <SidebarMenuSubButton @click="toggleTeachersMenu">
                     <GraduationCap class="mr-2 h-4 w-4" />
                     <span>Quản lý giáo viên</span>
+                    <span class="ml-auto flex items-center">
+                      <ChevronDown v-if="teachersMenuOpen" class="h-4 w-4 transition-transform" />
+                      <ChevronRight v-else class="h-4 w-4 transition-transform" />
+                    </span>
                   </SidebarMenuSubButton>
                   <SidebarMenuSub v-show="teachersMenuOpen">
                     <SidebarMenuButton :is-active="page.url === '/admin/teachers'" as-child>
@@ -152,12 +169,23 @@ const toggleTeachersMenu = () => {
 
               <!-- Quản lý học sinh -->
               <SidebarMenuItem>
-                <SidebarMenuButton :is-active="page.url.startsWith('/admin/students')" as-child>
-                  <Link href="/admin/students">
+                <!-- <SidebarMenuSub> -->
+                  <SidebarMenuSubButton @click="toggleStudentsMenu">
                     <Users class="mr-2 h-4 w-4" />
                     <span>Quản lý học sinh</span>
-                  </Link>
-                </SidebarMenuButton>
+                    <span class="ml-auto flex items-center">
+                      <ChevronDown v-if="studentsMenuOpen" class="h-4 w-4 transition-transform" />
+                      <ChevronRight v-else class="h-4 w-4 transition-transform" />
+                    </span>
+                  </SidebarMenuSubButton>
+                  <SidebarMenuSub v-show="studentsMenuOpen">
+                    <SidebarMenuButton :is-active="page.url === '/admin/students'" as-child>
+                      <Link href="/admin/students">
+                        <span>Danh sách học sinh</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuSub>
+                <!-- </SidebarMenuSub> -->
               </SidebarMenuItem>
             </SidebarGroupContent>
           </SidebarGroup>

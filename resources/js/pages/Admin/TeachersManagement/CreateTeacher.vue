@@ -90,7 +90,7 @@
 
             <!-- Buttons -->
             <div class="flex justify-end space-x-4 pt-6">
-              <Link :href="/admin/teachers">
+              <Link href="/admin/teachers">
                 <Button variant="outline" type="button">
                   Hủy
                 </Button>

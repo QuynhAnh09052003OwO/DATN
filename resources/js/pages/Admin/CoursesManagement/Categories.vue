@@ -1,10 +1,10 @@
 <template>
-  <AdminLayout title="Phân loại khóa học - Admin" page-title="Phân loại khóa học">
+  <AdminLayout title="Phân loại khóa học - Admin" page-title="Quản lý khóa học">
     <div class="space-y-6">
       <!-- Header Actions -->
       <div class="flex justify-between items-center">
         <div>
-          <h2 class="text-2xl font-bold text-gray-900">Danh sách phân loại</h2>
+          <h2 class="text-2xl font-bold text-gray-900">Phân loại danh mục khóa học</h2>
           <p class="text-gray-600">Quản lý các danh mục khóa học trong hệ thống</p>
         </div>
         <button 
