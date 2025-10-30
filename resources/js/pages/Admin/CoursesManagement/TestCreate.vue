@@ -185,12 +185,38 @@ function cancelCreate() {
   router.visit(`/admin/courses/${course.id}/edit`)
 }
 
-function saveTest() {
-  if (!questions.length) {
+async function saveTest() {
+  if (!questions.length) return
+  const fd = new FormData()
+  // Simple default title; in future, add a real input
+  fd.append('title', `Bài kiểm tra - ${section.title}`)
+  // Serialize questions (without files)
+  const plainQuestions = questions.map((q, idx) => ({
+    title: q.title,
+    answers: q.answers,
+    correctIndex: q.correctIndex,
+    order: idx + 1,
+    points: 1,
+  }))
+  fd.append('questions', JSON.stringify(plainQuestions))
+  // Attach files per question
+  questions.forEach((q, idx) => {
+    if (q.imageFile) fd.append(`image_${idx}`, q.imageFile)
+    if (q.audioFile) fd.append(`audio_${idx}`, q.audioFile)
+  })
+
+  const resp = await fetch(`/admin/sections/${section.id}/tests-json`, {
+    method: 'POST',
+    headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '') },
+    credentials: 'same-origin',
+    body: fd
+  })
+  if (!resp.ok) {
+    console.error('Save test failed', resp.status)
     return
   }
-  // TODO: hook API to persist test/questions
-  console.debug('Saving test draft', { course, section, questions })
+  const data = await resp.json()
+  router.visit(`/admin/courses/${course.id}/edit`)
 }
 </script>
 

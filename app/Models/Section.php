@@ -23,6 +23,11 @@ class Section extends Model
     {
         return $this->hasMany(Lesson::class)->orderBy('order');
     }
+
+    public function tests(): HasMany
+    {
+        return $this->hasMany(Test::class)->orderBy('order');
+    }
 }
 
 
