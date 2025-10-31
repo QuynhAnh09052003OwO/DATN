@@ -9,6 +9,16 @@
 
       <Card>
         <CardHeader>
+          <CardTitle>Tên bài kiểm tra</CardTitle>
+          <CardDescription>Nhập tiêu đề hiển thị cho bài kiểm tra.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Input v-model="testTitle" placeholder="Nhập tên bài kiểm tra" />
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
           <CardTitle>Danh sách câu hỏi</CardTitle>
           <CardDescription>Thêm câu hỏi, đáp án và nội dung đa phương tiện.</CardDescription>
         </CardHeader>
@@ -20,7 +30,7 @@
               <button type="button" class="text-red-600" @click="removeQuestion(idx)">Xóa</button>
             </div>
             <div class="mt-2">
-              <Label>Nội dung câu hỏi</Label>
+              <Label>Đề bài</Label>
               <Input v-model="q.title" placeholder="Nhập nội dung câu hỏi" />
             </div>
 
@@ -113,7 +123,7 @@ import AdminLayout from '@/layouts/AdminLayout.vue'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { router } from '@inertiajs/vue3'
 
 const props = defineProps({
@@ -124,6 +134,7 @@ const props = defineProps({
 
 const course = props.course
 const section = props.section
+const testTitle = ref(`Bài kiểm tra - ${section.title}`)
 const questions = reactive((props.questions || []).map(q => ({
   id: q.id,
   title: q.title,
@@ -189,7 +200,7 @@ async function saveTest() {
   if (!questions.length) return
   const fd = new FormData()
   // Simple default title; in future, add a real input
-  fd.append('title', `Bài kiểm tra - ${section.title}`)
+  fd.append('title', (testTitle.value && testTitle.value.trim()) ? testTitle.value.trim() : `Bài kiểm tra - ${section.title}`)
   // Serialize questions (without files)
   const plainQuestions = questions.map((q, idx) => ({
     title: q.title,
