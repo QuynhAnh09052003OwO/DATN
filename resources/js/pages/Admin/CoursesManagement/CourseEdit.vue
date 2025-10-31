@@ -451,7 +451,7 @@ const sections = ref([
 
 function addSection() {
   sections.value.push({
-    id: null,
+    id: Date.now() + Math.floor(Math.random() * 10000),
     title: '',
     description: '',
     lessons: []
@@ -485,7 +485,7 @@ function addLesson(sectionIdx) {
   const section = sections.value[sectionIdx]
   if (!section.lessons) section.lessons = []
   section.lessons.push({
-    id: null,
+    id: Date.now() + Math.floor(Math.random() * 10000),
     title: '',
     description: '',
     videoFile: null,
