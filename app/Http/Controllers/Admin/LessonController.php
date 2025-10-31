@@ -17,7 +17,7 @@ class LessonController extends Controller
             'description' => ['nullable', 'string'],
             'attachment' => ['nullable', 'file', 'mimes:pdf', 'max:51200'], // 50MB
             'video_url' => ['nullable', 'string', 'max:2048'],
-            'video_file' => ['nullable', 'file', 'mimetypes:video/*', 'max:204800'], // 200MB
+            'video_file' => ['nullable', 'file', 'mimetypes:video/*', 'max:512000'], // 500MB
             'video_duration' => ['nullable', 'integer', 'min:0'],
             'order' => ['nullable', 'integer', 'min:0'],
             'is_locked' => ['nullable', 'boolean'],
@@ -55,7 +55,7 @@ class LessonController extends Controller
             'description' => ['nullable', 'string'],
             'attachment' => ['nullable', 'file', 'mimes:pdf', 'max:51200'],
             'video_url' => ['nullable', 'string', 'max:2048'],
-            'video_file' => ['nullable', 'file', 'mimetypes:video/*', 'max:204800'],
+            'video_file' => ['nullable', 'file', 'mimetypes:video/*', 'max:512000'],
             'video_duration' => ['nullable', 'integer', 'min:0'],
             'order' => ['nullable', 'integer', 'min:0'],
             'is_locked' => ['nullable', 'boolean'],
@@ -97,7 +97,7 @@ class LessonController extends Controller
             'description' => ['nullable', 'string'],
             'attachment' => ['nullable', 'file', 'mimes:pdf', 'max:20480'],
             'video_url' => ['nullable', 'string', 'max:2048'],
-            'video_file' => ['nullable', 'file', 'mimetypes:video/*', 'max:51200'],
+            'video_file' => ['nullable', 'file', 'mimetypes:video/*', 'max:512000'],
             'video_duration' => ['nullable', 'integer', 'min:0'],
             'order' => ['nullable', 'integer', 'min:0'],
             'is_locked' => ['nullable', 'boolean'],
@@ -134,7 +134,7 @@ class LessonController extends Controller
             'description' => ['nullable', 'string'],
             'attachment' => ['nullable', 'file', 'mimes:pdf', 'max:51200'],
             'video_url' => ['nullable', 'string', 'max:2048'],
-            'video_file' => ['nullable', 'file', 'mimetypes:video/*', 'max:204800'],
+            'video_file' => ['nullable', 'file', 'mimetypes:video/*', 'max:512000'],
             'video_duration' => ['nullable', 'integer', 'min:0'],
             'order' => ['nullable', 'integer', 'min:0'],
             'is_locked' => ['nullable', 'boolean'],
