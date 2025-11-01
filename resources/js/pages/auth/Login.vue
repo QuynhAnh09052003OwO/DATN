@@ -33,6 +33,8 @@ const getUserTypeDisplay = () => {
 
 // Reactive data for password visibility
 const showPassword = ref(false);
+const remember = ref(false);
+const onRememberUpdate = (val: boolean) => { remember.value = !!val };
 </script>
 
 <template>
@@ -139,9 +141,16 @@ const showPassword = ref(false);
 
                             <div class="flex items-center justify-between">
                                 <Label for="remember" class="flex items-center space-x-2">
-                                    <Checkbox id="remember" name="remember" :tabindex="3" />
+                                    <Checkbox
+                                        id="remember"
+                                        :tabindex="3"
+                                        :checked="remember"
+                                        @update:checked="onRememberUpdate"
+                                    />
                                     <span class="text-sm">Ghi nhớ mật khẩu</span>
                                 </Label>
+                                <!-- Submit remember only when checked -->
+                                <input v-if="remember" type="hidden" name="remember" value="1" />
                                 <TextLink
                                     v-if="canResetPassword"
                                     href="/forgot-password"

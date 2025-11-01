@@ -183,6 +183,40 @@ Route::middleware(['auth', 'verified', 'role:student'])->prefix('student')->name
 
 /*
 |--------------------------------------------------------------------------
+| Debug Routes (Remove in production)
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/debug-session', function () {
+    $user = \Illuminate\Support\Facades\Auth::user();
+    $sessionId = \Illuminate\Support\Facades\Session::getId();
+    $sessionData = \Illuminate\Support\Facades\Session::all();
+    
+    return response()->json([
+        'authenticated' => \Illuminate\Support\Facades\Auth::check(),
+        'user' => $user ? [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+        ] : null,
+        'session_id' => $sessionId,
+        'session_driver' => config('session.driver'),
+        'session_lifetime' => config('session.lifetime'),
+        'session_data' => $sessionData,
+        'session_cookie_name' => config('session.cookie'),
+        'remember_token_set' => $user ? !empty($user->remember_token) : false,
+        'session_config' => [
+            'domain' => config('session.domain'),
+            'secure' => config('session.secure'),
+            'http_only' => config('session.http_only'),
+            'same_site' => config('session.same_site'),
+        ],
+    ]);
+})->middleware('web');
+
+/*
+|--------------------------------------------------------------------------
 | Settings Routes
 |--------------------------------------------------------------------------
 */
