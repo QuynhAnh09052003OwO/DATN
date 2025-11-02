@@ -75,14 +75,16 @@ class CategoryController extends Controller
     public function destroy(Category $category)
     {
         // Kiểm tra xem category có courses không
-        if ($category->courses()->count() > 0) {
+        if ($category->courses->isEmpty()) {
+            $category->delete();
+
             return redirect()->route('admin.courses.categories')
-                ->with('error', 'Không thể xóa danh mục này vì còn có khóa học liên quan!');
+                ->with('success', 'Danh mục đã được xóa thành công!');
+        }else{
+            return redirect()->route('admin.courses.categories')
+            ->with('error', 'Không thể xóa danh mục này vì còn có khóa học liên quan!');
         }
 
-        $category->delete();
-
-        return redirect()->route('admin.courses.categories')
-            ->with('success', 'Danh mục đã được xóa thành công!');
+       
     }
 }

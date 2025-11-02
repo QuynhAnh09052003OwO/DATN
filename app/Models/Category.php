@@ -18,7 +18,7 @@ class Category extends Model
     // Relationships
     public function courses(): HasMany
     {
-        return $this->hasMany(Course::class);
+        return $this->hasMany(Course::class)->where();
     }
 
     // Scopes - removed active scope since status column was removed

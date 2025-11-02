@@ -69,7 +69,7 @@ class CourseController extends Controller
             'type' => 'required|in:video,zoom',
             'category_id' => 'nullable|exists:categories,id',
             'image' => 'nullable|string',
-            'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240', // 10MB max
+            'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480', // 20MB max
             'duration' => 'nullable|numeric|min:0',
             'is_locked' => 'boolean',
             'teacher_ids' => 'nullable|array',
