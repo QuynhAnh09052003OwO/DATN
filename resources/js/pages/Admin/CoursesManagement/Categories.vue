@@ -124,13 +124,34 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { ref, onMounted } from 'vue'
+import { router, usePage } from '@inertiajs/vue3'
+import { toast } from 'vue-sonner'
 import AdminLayout from '@/layouts/AdminLayout.vue'
 
 // Props
 const props = defineProps({
   categories: Array
+})
+
+const page = usePage()
+
+// Listen for flash messages
+onMounted(() => {
+  // Success message from backend
+  if (page.props.flash?.success) {
+    toast.success(page.props.flash.success)
+  }
+  
+  // Error message from backend
+  if (page.props.flash?.error) {
+    toast.error(page.props.flash.error)
+  }
+  
+  // Info message from backend
+  if (page.props.flash?.info) {
+    toast.info(page.props.flash.info)
+  }
 })
 
 // Methods
@@ -143,9 +164,29 @@ const editCategory = (categoryId) => {
 }
 
 const deleteCategory = (categoryId) => {
-  if (confirm('Bạn có chắc chắn muốn xóa danh mục này?')) {
-    router.delete(`/admin/courses/categories/${categoryId}`)
-  }
+  const category = props.categories.find(cat => cat.id === categoryId)
+  const categoryName = category?.name || 'danh mục này'
+  
+  toast.warning(`Bạn có chắc chắn muốn xóa "${categoryName}"?`, {
+    action: {
+      label: 'Xóa',
+      onClick: () => {
+        router.delete(`/admin/courses/categories/${categoryId}`, {
+          onSuccess: () => {
+            toast.success(`Đã xóa danh mục "${categoryName}" thành công!`)
+          },
+          onError: () => {
+            toast.error('Có lỗi xảy ra khi xóa danh mục')
+          }
+        })
+      }
+    },
+    cancel: {
+      label: 'Hủy',
+      onClick: () => {}
+    },
+    duration: 5000
+  })
 }
 
 const formatDate = (date) => {

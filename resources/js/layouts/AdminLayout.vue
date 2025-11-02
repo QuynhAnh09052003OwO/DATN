@@ -1,13 +1,14 @@
 <script setup>
 import { ref } from 'vue'
 import { Head, Link, usePage } from '@inertiajs/vue3'
-import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, SidebarTrigger } from '@/components/ui/sidebar'
+import { SidebarProvider, Sidebar, SidebarContent, SidebarHeader, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, SidebarTrigger } from '@/components/ui/sidebar'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
+import { Toaster } from '@/components/ui/sonner'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { getInitials } from '@/composables/useInitials'
-import { Home, BookOpen, Users, GraduationCap, User, LogOut, ChevronRight, ChevronDown } from 'lucide-vue-next'
+import { Home, BookOpen, Users, GraduationCap, User, LogOut, ChevronRight, ChevronDown } from 'lucide-vue-next' 
 
 const props = defineProps({
   title: String,
@@ -244,5 +245,8 @@ const toggleStudentsMenu = () => {
         </main>
       </div>
     </div>
+    
+    <!-- Sonner Toaster -->
+    <Toaster />
   </SidebarProvider>
 </template>

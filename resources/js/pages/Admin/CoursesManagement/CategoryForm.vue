@@ -125,7 +125,8 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { router, usePage } from '@inertiajs/vue3'
+import { toast } from 'vue-sonner'
 import AdminLayout from '@/layouts/AdminLayout.vue'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -135,6 +136,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 const props = defineProps({
   category: Object
 })
+
+const page = usePage()
 
 // Computed
 const isEdit = computed(() => !!props.category)
@@ -150,30 +153,9 @@ const form = reactive({
   is_active: true
 })
 
-// Methods
-const submitForm = async () => {
-  isSubmitting.value = true
-  errors.value = {}
-
-  try {
-    if (isEdit.value) {
-      router.put(`/admin/courses/categories/${props.category.id}`, form)
-    } else {
-      router.post('/admin/courses/categories', form)
-    }
-  } catch (error) {
-    console.error('Form submission error:', error)
-  } finally {
-    isSubmitting.value = false
-  }
-}
-
-const goBack = () => {
-  router.visit('/admin/courses/categories')
-}
-
-// Initialize form data
+// Listen for flash messages
 onMounted(() => {
+  // Initialize form data
   if (props.category) {
     Object.assign(form, {
       name: props.category.name || '',
@@ -182,5 +164,77 @@ onMounted(() => {
       is_active: props.category.is_active !== undefined ? props.category.is_active : true
     })
   }
+  
+  // Success message from backend
+  if (page.props.flash?.success) {
+    toast.success(page.props.flash.success)
+  }
+  
+  // Error message from backend
+  if (page.props.flash?.error) {
+    toast.error(page.props.flash.error)
+  }
 })
+
+// Methods
+const submitForm = async () => {
+  isSubmitting.value = true
+  errors.value = {}
+
+  const action = isEdit.value
+    ? router.put(`/admin/courses/categories/${props.category.id}`, form, {
+        preserveScroll: true,
+        onSuccess: () => {
+          toast.success(`Danh mục "${form.name}" đã được cập nhật thành công!`)
+          // Redirect will be handled by backend
+        },
+        onError: (pageErrors) => {
+          errors.value = pageErrors || {}
+          
+          // Show error toast
+          if (pageErrors) {
+            const firstError = Object.values(pageErrors)[0]
+            if (typeof firstError === 'string') {
+              toast.error(firstError)
+            } else if (Array.isArray(firstError) && firstError.length > 0) {
+              toast.error(firstError[0])
+            } else {
+              toast.error('Có lỗi xảy ra khi cập nhật danh mục')
+            }
+          }
+        },
+        onFinish: () => {
+          isSubmitting.value = false
+        }
+      })
+    : router.post('/admin/courses/categories', form, {
+        preserveScroll: true,
+        onSuccess: () => {
+          toast.success(`Danh mục "${form.name}" đã được tạo thành công!`)
+          // Redirect will be handled by backend
+        },
+        onError: (pageErrors) => {
+          errors.value = pageErrors || {}
+          
+          // Show error toast
+          if (pageErrors) {
+            const firstError = Object.values(pageErrors)[0]
+            if (typeof firstError === 'string') {
+              toast.error(firstError)
+            } else if (Array.isArray(firstError) && firstError.length > 0) {
+              toast.error(firstError[0])
+            } else {
+              toast.error('Có lỗi xảy ra khi tạo danh mục')
+            }
+          }
+        },
+        onFinish: () => {
+          isSubmitting.value = false
+        }
+      })
+}
+
+const goBack = () => {
+  router.visit('/admin/courses/categories')
+}
 </script>
