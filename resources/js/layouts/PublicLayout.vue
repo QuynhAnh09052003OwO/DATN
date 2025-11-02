@@ -63,7 +63,7 @@
                 <div 
                   v-if="userMenuOpen" 
                   @click.away="userMenuOpen = false"
-                  class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 focus:outline-none"
+                  class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
                 >
                   <!-- Show "Quản lý" if user is admin -->
                   <Link 
@@ -86,7 +86,7 @@
                     method="post" 
                     as="button"
                     class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    @click="userMenuOpen = false"
+                    @click="handleLogout"
                   >
                     Đăng xuất
                   </Link>
@@ -106,15 +106,32 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { Head, Link, usePage } from '@inertiajs/vue3'
+import { ref, watch, computed } from 'vue'
+import { Head, Link, router, usePage } from '@inertiajs/vue3'
 
 const props = defineProps({
   title: String,
 })
 
 const page = usePage()
-const user = page.props.auth?.user
+const user = computed(() => page.props.auth?.user)
 const userMenuOpen = ref(false)
+
+// Reload layout sau khi đăng xuất
+watch(
+  () => page.props.auth?.user,
+  (newUser, oldUser) => {
+    // Nếu user chuyển từ có user sang không có user (đã đăng xuất)
+    if (oldUser && !newUser) {
+      // Reload lại trang để refresh layout
+      router.reload({ only: [] })
+    }
+  }
+)
+
+// Handle logout click
+const handleLogout = () => {
+  userMenuOpen.value = false
+}
 </script>
 
