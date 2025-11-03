@@ -11,7 +11,7 @@ class CourseController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Course::with(['category', 'teachers'])
+        $query = Course::with(['categories', 'teachers'])
             ->where('status', 'released');
 
         // Search filter
@@ -23,9 +23,12 @@ class CourseController extends Controller
             });
         }
 
-        // Category filter
+        // Category filter (many-to-many)
         if ($request->filled('category')) {
-            $query->where('category_id', $request->category);
+            $categoryId = $request->category;
+            $query->whereHas('categories', function($q) use ($categoryId) {
+                $q->where('categories.id', $categoryId);
+            });
         }
 
         // Type filter

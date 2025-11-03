@@ -124,7 +124,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { router, usePage } from '@inertiajs/vue3'
 import { toast } from 'vue-sonner'
 import AdminLayout from '@/layouts/AdminLayout.vue'
@@ -172,8 +172,27 @@ const deleteCategory = (categoryId) => {
       label: 'Xóa',
       onClick: () => {
         router.delete(`/admin/courses/categories/${categoryId}`, {
-          onSuccess: () => {
-            toast.success(`Đã xóa danh mục "${categoryName}" thành công!`)
+          preserveScroll: true,
+          onSuccess: async () => {
+            await nextTick()
+            const page = usePage()
+            const flash = page.props.flash || {}
+            const stillExists = (page.props.categories || []).some(c => c.id === categoryId)
+            if (flash.error) {
+              toast.error(flash.error)
+              return
+            }
+            if (stillExists) {
+              const cat = (page.props.categories || []).find(c => c.id === categoryId)
+              const count = cat?.courses_count ?? 0
+              toast.error(`Không thể xóa danh mục vì đang liên kết với ${count} khóa học.`)
+              return
+            }
+            if (flash.success) {
+              toast.success(flash.success)
+            } else {
+              toast.success(`Đã xóa danh mục "${categoryName}" thành công!`)
+            }
           },
           onError: () => {
             toast.error('Có lỗi xảy ra khi xóa danh mục')

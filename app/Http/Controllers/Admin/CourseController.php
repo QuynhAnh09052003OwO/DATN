@@ -17,7 +17,7 @@ class CourseController extends Controller
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
-        $categories = \App\Models\Category::get(['id', 'name']);
+        $categories = \App\Models\Category::where('is_active', true)->get(['id', 'name']);
 
         return Inertia::render('Admin/CoursesManagement/Courses', [
             'courses' => $courses,
@@ -47,7 +47,7 @@ class CourseController extends Controller
     public function edit(Course $course)
     {
         $course->load(['teachers', 'categories']);
-        $categories = \App\Models\Category::get(['id', 'name']);
+        $categories = \App\Models\Category::where('is_active', true)->get(['id', 'name']);
         $teachers = User::where('role', 'teacher')->get(['id', 'name', 'email']);
         
         // Get teacher_ids from course_user relationship

@@ -42,7 +42,8 @@ Route::get('/login/student', function () {
 Route::get('/login/teacher', function () {
     return Inertia::render('auth/Login', [
         'canResetPassword' => Features::enabled(Features::resetPasswords()),
-        'canRegister' => Features::enabled(Features::registration()),
+        // Disable registration on teacher login
+        'canRegister' => false,
         'userType' => 'teacher',
         'status' => session('status'),
     ]);
@@ -51,7 +52,8 @@ Route::get('/login/teacher', function () {
 Route::get('/login/admin', function () {
     return Inertia::render('auth/Login', [
         'canResetPassword' => Features::enabled(Features::resetPasswords()),
-        'canRegister' => Features::enabled(Features::registration()),
+        // Disable registration on admin login
+        'canRegister' => false,
         'userType' => 'admin',
         'status' => session('status'),
     ]);
@@ -109,6 +111,9 @@ Route::middleware(['auth', 'ensure.role:admin'])->prefix('admin')->name('admin.'
     
     // Teachers Management
     Route::get('/teachers', [\App\Http\Controllers\Admin\TeacherController::class, 'index'])->name('teachers');
+    Route::get('/teachers/{teacher}/edit', [\App\Http\Controllers\Admin\TeacherController::class, 'edit'])->name('teachers.edit');
+    Route::put('/teachers/{teacher}', [\App\Http\Controllers\Admin\TeacherController::class, 'update'])->name('teachers.update');
+    Route::delete('/teachers/{teacher}', [\App\Http\Controllers\Admin\TeacherController::class, 'destroy'])->name('teachers.destroy');
     Route::get('/teachers/create', [\App\Http\Controllers\Admin\TeacherController::class, 'create'])->name('teachers.create');
     Route::post('/teachers', [\App\Http\Controllers\Admin\TeacherController::class, 'store'])->name('teachers.store');
 

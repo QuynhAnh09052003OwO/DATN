@@ -88,18 +88,23 @@
                 </button>
                 <div v-if="showCategoryDropdown" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
                   <div class="p-2">
-                    <div v-for="cat in categories" :key="cat.id" class="flex items-center px-3 py-2 hover:bg-gray-50 rounded">
-                      <input
-                        :id="`category-${cat.id}`"
-                        type="checkbox"
-                        :checked="form.category_ids && form.category_ids.includes(cat.id)"
-                        @change="toggleCategory(cat.id)"
-                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
-                      <label :for="`category-${cat.id}`" class="ml-2 text-sm text-gray-700 cursor-pointer flex-1">
-                        {{ cat.name }}
-                      </label>
+                    <div v-if="!categories || categories.length === 0" class="px-3 py-2 text-sm text-gray-500">
+                      Chọn phân loại
                     </div>
+                    <template v-else>
+                      <div v-for="cat in categories" :key="cat.id" class="flex items-center px-3 py-2 hover:bg-gray-50 rounded">
+                        <input
+                          :id="`category-${cat.id}`"
+                          type="checkbox"
+                          :checked="form.category_ids && form.category_ids.includes(cat.id)"
+                          @change="toggleCategory(cat.id)"
+                          class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        />
+                        <label :for="`category-${cat.id}`" class="ml-2 text-sm text-gray-700 cursor-pointer flex-1">
+                          {{ cat.name }}
+                        </label>
+                      </div>
+                    </template>
                   </div>
                 </div>
               </div>

@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Category extends Model
 {
@@ -15,10 +15,14 @@ class Category extends Model
         'is_active',
     ];
 
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
+
     // Relationships
-    public function courses(): HasMany
+    public function courses(): BelongsToMany
     {
-        return $this->hasMany(Course::class);
+        return $this->belongsToMany(Course::class, 'category_course', 'category_id', 'course_id')->withTimestamps();
     }
 
     // Scopes - removed active scope since status column was removed

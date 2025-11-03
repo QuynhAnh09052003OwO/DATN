@@ -32,6 +32,7 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255|unique:categories',
             'description' => 'nullable|string',
             'color' => 'nullable|string|max:7',
+            'is_active' => 'nullable|boolean',
         ]);
 
         Category::create([
@@ -39,7 +40,7 @@ class CategoryController extends Controller
             'slug' => Str::slug($request->name),
             'description' => $request->description,
             'color' => $request->color ?? '#3B82F6',
-            'is_active' => true,
+            'is_active' => $request->boolean('is_active'),
         ]);
 
         return redirect()->route('admin.courses.categories')
@@ -59,6 +60,7 @@ class CategoryController extends Controller
             'name' => 'required|string|max:255|unique:categories,name,' . $category->id,
             'description' => 'nullable|string',
             'color' => 'nullable|string|max:7',
+            'is_active' => 'nullable|boolean',
         ]);
 
         $category->update([
@@ -66,6 +68,7 @@ class CategoryController extends Controller
             'slug' => Str::slug($request->name),
             'description' => $request->description,
             'color' => $request->color ?? '#3B82F6',
+            'is_active' => $request->boolean('is_active'),
         ]);
 
         return redirect()->route('admin.courses.categories')
@@ -74,17 +77,16 @@ class CategoryController extends Controller
 
     public function destroy(Category $category)
     {
-        // Kiểm tra xem category có courses không
-        if ($category->courses->isEmpty()) {
-            $category->delete();
-
+        // Không cho phép xóa nếu còn liên kết với khóa học qua pivot category_course
+        $linkedCount = $category->courses()->count();
+        if ($linkedCount > 0) {
             return redirect()->route('admin.courses.categories')
-                ->with('success', 'Danh mục đã được xóa thành công!');
-        }else{
-            return redirect()->route('admin.courses.categories')
-            ->with('error', 'Không thể xóa danh mục này vì còn có khóa học liên quan!');
+                ->with('error', "Không thể xóa. Danh mục đang liên kết với {$linkedCount} khóa học.");
         }
 
-       
+        $category->delete();
+
+        return redirect()->route('admin.courses.categories')
+            ->with('success', 'Danh mục đã được xóa thành công!');
     }
 }

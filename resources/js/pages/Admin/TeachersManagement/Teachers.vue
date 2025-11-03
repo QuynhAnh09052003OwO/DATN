@@ -114,10 +114,10 @@
                 </TableCell>
                 <TableCell class="text-right">
                   <div class="flex gap-2 justify-end">
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" @click="editTeacher(teacher.id)">
                       <Pencil class="h-4 w-4" />
                     </Button>
-                    <Button variant="ghost" size="sm">
+                    <Button variant="ghost" size="sm" @click="deleteTeacher(teacher.id, teacher.name)">
                       <Trash2 class="h-4 w-4 text-destructive" />
                     </Button>
                   </div>
@@ -163,7 +163,8 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Plus, Pencil, Trash2, ChevronLeft, ChevronRight } from 'lucide-vue-next'
-import { Link } from '@inertiajs/vue3'
+import { Link, router } from '@inertiajs/vue3'
+import { toast } from 'vue-sonner'
 import { getInitials } from '@/composables/useInitials'
 
 const generateAvatar = (name, color = '#3B82F6') => {
@@ -247,4 +248,25 @@ const breadcrumbs = [
   { title: 'Admin', href: '/admin' },
   { title: 'Quản lý giáo viên' }
 ]
+
+// Actions
+const editTeacher = (teacherId) => {
+  router.visit(`/admin/teachers/${teacherId}/edit`)
+}
+
+const deleteTeacher = (teacherId, teacherName) => {
+  toast.warning(`Bạn có chắc muốn xóa giáo viên "${teacherName}"?`, {
+    action: {
+      label: 'Xóa',
+      onClick: () => {
+        router.delete(`/admin/teachers/${teacherId}`, {
+          onSuccess: () => toast.success(`Đã xóa giáo viên "${teacherName}"`),
+          onError: () => toast.error('Không thể xóa giáo viên')
+        })
+      }
+    },
+    cancel: { label: 'Hủy' },
+    duration: 5000
+  })
+}
 </script>

@@ -104,7 +104,11 @@
                   </span>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm text-gray-900">{{ course.category?.name || 'Chưa phân loại' }}</div>
+                  <div class="text-sm text-gray-900">
+                    {{ (course.categories && course.categories.length)
+                        ? course.categories.map(c => c.name).join(', ')
+                        : 'Chưa phân loại' }}
+                  </div>
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap">
                   <span :class="[
@@ -233,7 +237,7 @@ const filteredCourses = computed(() => {
   return props.courses.data.filter(course => {
     const matchesSearch = course.title.toLowerCase().includes(search.value.toLowerCase()) ||
                          course.description?.toLowerCase().includes(search.value.toLowerCase())
-    const matchesCategory = !categoryFilter.value || course.category_id == categoryFilter.value
+    const matchesCategory = !categoryFilter.value || (Array.isArray(course.categories) && course.categories.some(c => String(c.id) === String(categoryFilter.value)))
     const matchesType = !typeFilter.value || course.type === typeFilter.value
     
     return matchesSearch && matchesCategory && matchesType
