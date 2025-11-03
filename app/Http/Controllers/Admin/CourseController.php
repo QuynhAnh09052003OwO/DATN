@@ -13,7 +13,7 @@ class CourseController extends Controller
 {
     public function index()
     {
-        $courses = Course::with(['category', 'teachers'])
+        $courses = Course::with(['categories', 'teachers'])
             ->orderBy('created_at', 'desc')
             ->paginate(10);
 
@@ -46,12 +46,14 @@ class CourseController extends Controller
 
     public function edit(Course $course)
     {
-        $course->load(['category', 'teachers']);
+        $course->load(['teachers', 'categories']);
         $categories = \App\Models\Category::get(['id', 'name']);
         $teachers = User::where('role', 'teacher')->get(['id', 'name', 'email']);
         
         // Get teacher_ids from course_user relationship
         $course->teacher_ids = $course->teachers->pluck('id')->toArray();
+        // Get category_ids from pivot
+        $course->category_ids = $course->categories->pluck('id')->toArray();
         
         return Inertia::render('Admin/CoursesManagement/CourseEdit', [
             'course' => $course,
@@ -67,16 +69,17 @@ class CourseController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0|max:50000000', // Max 50,000,000 VNĐ 
             'type' => 'required|in:video,zoom',
-            'category_id' => 'nullable|exists:categories,id',
             'image' => 'nullable|string',
             'image_file' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:20480', // 20MB max
             'duration' => 'nullable|numeric|min:0',
             'is_locked' => 'boolean',
             'teacher_ids' => 'nullable|array',
             'teacher_ids.*' => 'exists:users,id',
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => 'exists:categories,id',
         ]);
 
-        $data = $request->except(['image_file', 'teacher_ids']);
+        $data = $request->except(['image_file', 'teacher_ids', 'category_ids']);
 
         // Handle image upload
         if ($request->hasFile('image_file')) {
@@ -105,6 +108,15 @@ class CourseController extends Controller
                 $teachers[$teacherId] = ['role' => 'teacher', 'enrolled_at' => now()];
             }
             $course->teachers()->sync($teachers);
+        }
+
+        // Sync categories to category_course pivot (robust for JSON requests)
+        $categoryIds = (array) $request->input('category_ids', []);
+        $categoryIds = array_values(array_filter($categoryIds, function ($v) { return $v !== null && $v !== ''; }));
+        if (!empty($categoryIds)) {
+            $course->categories()->sync($categoryIds);
+        } else if ($request->has('category_ids')) {
+            $course->categories()->sync([]);
         }
 
         return redirect()->route('admin.courses')

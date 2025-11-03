@@ -15,7 +15,7 @@ class AdminUserSeeder extends Seeder
         \App\Models\User::create([
             'name' => 'Admin',
             'email' => 'admin@doraedu.com',
-            'password' => bcrypt('password'),
+            'password' => bcrypt('12345678'),
             'role' => 'admin',
             'email_verified_at' => now(),
         ]);
@@ -23,7 +23,7 @@ class AdminUserSeeder extends Seeder
         \App\Models\User::create([
             'name' => 'Teacher',
             'email' => 'teacher@doraedu.com',
-            'password' => bcrypt('password'),
+            'password' => bcrypt('12345678'),
             'role' => 'teacher',
             'email_verified_at' => now(),
         ]);
@@ -31,7 +31,7 @@ class AdminUserSeeder extends Seeder
         \App\Models\User::create([
             'name' => 'Student',
             'email' => 'student@doraedu.com',
-            'password' => bcrypt('password'),
+            'password' => bcrypt('12345678'),
             'role' => 'student',
             'email_verified_at' => now(),
         ]);

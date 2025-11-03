@@ -70,19 +70,50 @@
             </div>
 
 
-            <!-- Danh mục -->
+            <!-- Phân loại (đa lựa chọn giống giảng viên) -->
             <div>
               <Label>Phân loại</Label>
-              <select
-                v-model="form.category_id"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-              >
-                <option value="">Chọn danh mục</option>
-                <option v-for="category in categories" :key="category.id" :value="category.id">
-                  {{ category.name }}
-                </option>
-              </select>
-              <div v-if="errors.category_id" class="mt-1 text-sm text-red-600">{{ errors.category_id }}</div>
+              <div class="relative">
+                <button
+                  @click="showCategoryDropdown = !showCategoryDropdown"
+                  type="button"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-left flex items-center justify-between"
+                >
+                  <span class="text-gray-700">
+                    {{ selectedCategories.length > 0 ? `${selectedCategories.length} phân loại đã chọn` : 'Chọn phân loại' }}
+                  </span>
+                  <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                  </svg>
+                </button>
+                <div v-if="showCategoryDropdown" class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                  <div class="p-2">
+                    <div v-for="cat in categories" :key="cat.id" class="flex items-center px-3 py-2 hover:bg-gray-50 rounded">
+                      <input
+                        :id="`category-${cat.id}`"
+                        type="checkbox"
+                        :checked="form.category_ids && form.category_ids.includes(cat.id)"
+                        @change="toggleCategory(cat.id)"
+                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                      <label :for="`category-${cat.id}`" class="ml-2 text-sm text-gray-700 cursor-pointer flex-1">
+                        {{ cat.name }}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-if="selectedCategories.length > 0" class="mt-2 flex flex-wrap gap-2">
+                <span
+                  v-for="cat in selectedCategories"
+                  :key="cat.id"
+                  class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-green-100 text-green-800"
+                >
+                  {{ cat.name }}
+                  <button @click="removeCategory(cat.id)" type="button" class="ml-2 text-green-600 hover:text-green-800">×</button>
+                </span>
+              </div>
+              <div v-if="errors.category_ids" class="mt-1 text-sm text-red-600">{{ errors.category_ids }}</div>
             </div>
 
             <!-- Hình ảnh -->
@@ -416,6 +447,7 @@ const errors = ref({})
 const imagePreview = ref('')
 const selectedFile = ref(null)
 const showTeacherDropdown = ref(false)
+const showCategoryDropdown = ref(false)
 
 // Toast
 const toast = reactive({ show: false, message: '' })
@@ -429,7 +461,8 @@ const form = reactive({
   title: props.course?.title || '',
   description: props.course?.description || '',
   type: props.course?.type || 'video',
-  category_id: props.course?.category_id || null,
+  // dùng đa phân loại qua category_ids
+  category_ids: props.course?.category_ids || [],
   image: props.course?.image || '',
   price: props.course?.price || 0,
   duration: props.course?.duration || 0,
@@ -441,6 +474,12 @@ const form = reactive({
 const selectedTeachers = computed(() => {
   if (!form.teacher_ids || !Array.isArray(form.teacher_ids)) return []
   return props.teachers.filter(teacher => form.teacher_ids.includes(teacher.id))
+})
+
+// Computed for selected categories display
+const selectedCategories = computed(() => {
+  if (!form.category_ids || !Array.isArray(form.category_ids)) return []
+  return (props.categories || []).filter(cat => form.category_ids.includes(cat.id))
 })
 
 // Học phần - sectionsList
@@ -701,6 +740,25 @@ const removeTeacher = (teacherId) => {
   }
 }
 
+// Categories handlers
+const toggleCategory = (categoryId) => {
+  if (!form.category_ids) form.category_ids = []
+  const index = form.category_ids.indexOf(categoryId)
+  if (index > -1) {
+    form.category_ids.splice(index, 1)
+  } else {
+    form.category_ids.push(categoryId)
+  }
+}
+
+const removeCategory = (categoryId) => {
+  if (!form.category_ids) return
+  const index = form.category_ids.indexOf(categoryId)
+  if (index > -1) {
+    form.category_ids.splice(index, 1)
+  }
+}
+
 // Methods
 const handleFileSelect = (event) => {
   const file = event.target.files[0]
@@ -834,7 +892,7 @@ onMounted(() => {
       title: props.course.title || '',
       description: props.course.description || '',
       type: props.course.type || 'video',
-      category_id: props.course.category_id || null,
+      category_ids: props.course.category_ids || [],
       image: props.course.image || '',
       price: props.course.price || 0,
       duration: props.course.duration || 0,
@@ -852,6 +910,7 @@ onMounted(() => {
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.relative')) {
       showTeacherDropdown.value = false
+      showCategoryDropdown.value = false
     }
   })
 

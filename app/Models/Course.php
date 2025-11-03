@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 class Course extends Model
 {
@@ -14,7 +14,6 @@ class Course extends Model
         'price',
         'type',
         'status',
-        'category_id',
         'image',
         'duration',
         'is_locked',
@@ -27,9 +26,9 @@ class Course extends Model
     ];
 
     // Relationships
-    public function category(): BelongsTo
+    public function categories(): BelongsToMany
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsToMany(Category::class, 'category_course', 'course_id', 'category_id')->withTimestamps();
     }
 
     // Many-to-many relationship with users
