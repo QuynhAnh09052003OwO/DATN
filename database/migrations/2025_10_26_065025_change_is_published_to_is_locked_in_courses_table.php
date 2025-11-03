@@ -12,11 +12,15 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('courses', function (Blueprint $table) {
-            // Drop is_published column
-            $table->dropColumn('is_published');
+            // Drop is_published column (chỉ khi tồn tại)
+            if (Schema::hasColumn('courses', 'is_published')) {
+                $table->dropColumn('is_published');
+            }
             
-            // Add is_locked column with default true
-            $table->boolean('is_locked')->default(true)->after('duration');
+            // Add is_locked column with default true (chỉ khi chưa tồn tại)
+            if (!Schema::hasColumn('courses', 'is_locked')) {
+                $table->boolean('is_locked')->default(true)->after('duration');
+            }
         });
     }
 
@@ -26,11 +30,15 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('courses', function (Blueprint $table) {
-            // Drop is_locked column
-            $table->dropColumn('is_locked');
+            // Drop is_locked column (chỉ khi tồn tại)
+            if (Schema::hasColumn('courses', 'is_locked')) {
+                $table->dropColumn('is_locked');
+            }
             
-            // Add back is_published column
-            $table->boolean('is_published')->default(false)->after('duration');
+            // Add back is_published column (chỉ khi chưa tồn tại)
+            if (!Schema::hasColumn('courses', 'is_published')) {
+                $table->boolean('is_published')->default(false)->after('duration');
+            }
         });
     }
 };

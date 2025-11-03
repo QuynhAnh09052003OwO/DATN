@@ -431,7 +431,7 @@
 
 <script setup>
 import { ref, reactive, computed, onMounted } from 'vue'
-import { router } from '@inertiajs/vue3'
+import { router, usePage } from '@inertiajs/vue3'
 import AdminLayout from '@/layouts/AdminLayout.vue'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -445,6 +445,18 @@ const props = defineProps({
   categories: Array,
   teachers: Array
 })
+
+// Get CSRF token helper
+const page = usePage()
+const getCsrfToken = () => {
+  // Try from Inertia shared props first
+  if (page.props.csrf_token) {
+    return page.props.csrf_token
+  }
+  // Fallback to meta tag
+  const meta = document.querySelector('meta[name="csrf-token"]')
+  return meta ? meta.getAttribute('content') : ''
+}
 
 // Reactive data
 const isSubmitting = ref(false)
@@ -508,9 +520,9 @@ async function removeSection(idx) {
   if (!confirm('Bạn có chắc muốn xóa học phần này?')) return
   if (section.serverId || section.id) {
     const id = section.serverId || section.id
-    const resp = await fetch(`/admin/sections/${id}`, {
+    const resp = await fetch(`/admin/sections/${id}/json`, {
       method: 'DELETE',
-      headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '') },
+      headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': getCsrfToken() },
       credentials: 'same-origin'
     })
     if (!resp.ok) {
@@ -546,9 +558,9 @@ async function removeLesson(sectionIdx, lessonIdx) {
   if (!lesson) return
   if (!confirm('Bạn có chắc muốn xóa bài học này?')) return
   if (lesson.id) {
-    const resp = await fetch(`/admin/lessons/${lesson.id}`, {
+    const resp = await fetch(`/admin/lessons/${lesson.id}/json`, {
       method: 'DELETE',
-      headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '') },
+      headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': getCsrfToken() },
       credentials: 'same-origin'
     })
     if (!resp.ok) {
@@ -606,6 +618,7 @@ function saveSection(sectionIdx) {
   // Create or update section, then upsert lessons
   const payload = {
     title: section.title,
+    description: section.description || null,
     order: section.order ?? sectionIdx + 1
   }
   const isUpdate = !!section.serverId
@@ -619,7 +632,7 @@ function saveSection(sectionIdx) {
       'X-Requested-With': 'XMLHttpRequest',
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-      'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '')
+      'X-CSRF-TOKEN': getCsrfToken()
     },
     credentials: 'same-origin',
     body: JSON.stringify(payload)
@@ -654,7 +667,7 @@ function saveSection(sectionIdx) {
       const lessonMethod = isLessonUpdate ? 'PUT' : 'POST'
       const resp = await fetch(lessonUrl, {
         method: lessonMethod,
-        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '') },
+        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': getCsrfToken() },
         credentials: 'same-origin',
         body: fd
       })

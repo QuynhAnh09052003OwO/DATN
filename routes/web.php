@@ -17,6 +17,7 @@ Route::get('/', function () {
 })->name('home');
 
 Route::get('/courses', [\App\Http\Controllers\CourseController::class, 'index'])->name('courses');
+Route::get('/courses/{course}', [\App\Http\Controllers\CourseController::class, 'show'])->name('courses.show');
 
 /*
 |--------------------------------------------------------------------------
@@ -124,10 +125,12 @@ Route::middleware(['auth', 'ensure.role:admin'])->prefix('admin')->name('admin.'
     Route::put('/sections/{section}/json', [\App\Http\Controllers\Admin\SectionController::class, 'updateJson'])->name('sections.updateJson');
     Route::put('/sections/{section}', [\App\Http\Controllers\Admin\SectionController::class, 'update'])->name('sections.update');
     Route::delete('/sections/{section}', [\App\Http\Controllers\Admin\SectionController::class, 'destroy'])->name('sections.destroy');
+    Route::delete('/sections/{section}/json', [\App\Http\Controllers\Admin\SectionController::class, 'destroyJson'])->name('sections.destroyJson');
 
     Route::post('/sections/{section}/lessons', [\App\Http\Controllers\Admin\LessonController::class, 'store'])->name('lessons.store');
     Route::post('/sections/{section}/lessons-json', [\App\Http\Controllers\Admin\LessonController::class, 'storeJson'])->name('lessons.storeJson');
     Route::put('/lessons/{lesson}/json', [\App\Http\Controllers\Admin\LessonController::class, 'updateJson'])->name('lessons.updateJson');
+    Route::delete('/lessons/{lesson}/json', [\App\Http\Controllers\Admin\LessonController::class, 'destroyJson'])->name('lessons.destroyJson');
 
     // Tests Management (create page)
     Route::get('/courses/{course}/sections/{section}/tests/create', [\App\Http\Controllers\Admin\TestController::class, 'create'])->name('tests.create');

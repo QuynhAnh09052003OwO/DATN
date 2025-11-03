@@ -12,14 +12,38 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('courses', function (Blueprint $table) {
-            // Thêm các cột mới
-            $table->enum('type', ['video', 'zoom'])->default('video')->after('description');
-            $table->foreignId('category_id')->nullable()->constrained('categories')->onDelete('set null')->after('type');
-            $table->boolean('is_published')->default(false)->after('image');
-            $table->foreignId('teacher_id')->nullable()->constrained('users')->onDelete('set null')->after('is_published');
+            // Thêm các cột mới (chỉ khi chưa tồn tại)
+            if (!Schema::hasColumn('courses', 'type')) {
+                $table->enum('type', ['video', 'zoom'])->default('video')->after('description');
+            }
             
-            // Xóa các cột không cần thiết
-            $table->dropColumn(['category', 'max_students', 'is_featured']);
+            if (!Schema::hasColumn('courses', 'category_id')) {
+                $table->foreignId('category_id')->nullable()->constrained('categories')->onDelete('set null')->after('type');
+            }
+            
+            if (!Schema::hasColumn('courses', 'is_published')) {
+                $table->boolean('is_published')->default(false)->after('image');
+            }
+            
+            if (!Schema::hasColumn('courses', 'teacher_id')) {
+                $table->foreignId('teacher_id')->nullable()->constrained('users')->onDelete('set null')->after('is_published');
+            }
+            
+            // Xóa các cột không cần thiết (chỉ khi tồn tại)
+            $columnsToDrop = [];
+            if (Schema::hasColumn('courses', 'category')) {
+                $columnsToDrop[] = 'category';
+            }
+            if (Schema::hasColumn('courses', 'max_students')) {
+                $columnsToDrop[] = 'max_students';
+            }
+            if (Schema::hasColumn('courses', 'is_featured')) {
+                $columnsToDrop[] = 'is_featured';
+            }
+            
+            if (!empty($columnsToDrop)) {
+                $table->dropColumn($columnsToDrop);
+            }
         });
     }
 

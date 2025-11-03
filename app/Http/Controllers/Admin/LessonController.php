@@ -89,6 +89,12 @@ class LessonController extends Controller
         return back()->with('success', 'Đã xóa bài học.');
     }
 
+    public function destroyJson(Lesson $lesson)
+    {
+        $lesson->delete();
+        return response()->noContent();
+    }
+
     // JSON endpoint for SPA/AJAX usage
     public function storeJson(Request $request, Section $section)
     {

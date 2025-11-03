@@ -13,11 +13,13 @@ class SectionController extends Controller
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
             'order' => ['nullable', 'integer', 'min:0'],
         ]);
 
         $section = $course->sections()->create([
             'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
             'order' => $validated['order'] ?? ($course->sections()->max('order') + 1),
         ]);
 
@@ -28,11 +30,13 @@ class SectionController extends Controller
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
             'order' => ['nullable', 'integer', 'min:0'],
         ]);
 
         $section->update([
             'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
             'order' => $validated['order'] ?? $section->order,
         ]);
 
@@ -45,16 +49,24 @@ class SectionController extends Controller
         return back()->with('success', 'Đã xóa học phần.');
     }
 
+    public function destroyJson(Section $section)
+    {
+        $section->delete();
+        return response()->noContent();
+    }
+
     // JSON endpoints for SPA/AJAX usage
     public function storeJson(Request $request, Course $course)
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
             'order' => ['nullable', 'integer', 'min:0'],
         ]);
 
         $section = $course->sections()->create([
             'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
             'order' => $validated['order'] ?? ($course->sections()->max('order') + 1),
         ]);
 
@@ -65,11 +77,13 @@ class SectionController extends Controller
     {
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
             'order' => ['nullable', 'integer', 'min:0'],
         ]);
 
         $section->update([
             'title' => $validated['title'],
+            'description' => $validated['description'] ?? null,
             'order' => $validated['order'] ?? $section->order,
         ]);
 

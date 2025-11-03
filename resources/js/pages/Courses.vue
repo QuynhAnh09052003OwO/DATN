@@ -116,10 +116,10 @@
             <div class="flex items-center justify-between">
               <span class="text-lg font-bold text-green-600">{{ formatPrice(course.price) }}</span>
               <Link 
-                href="/register" 
+                :href="`/courses/${course.id}`"
                 class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
               >
-                Đăng ký ngay
+                Xem
               </Link>
             </div>
           </div>

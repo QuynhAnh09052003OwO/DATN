@@ -12,8 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->enum('gender', ['male', 'female', 'other'])->nullable()->after('name');
-            $table->string('phone')->nullable()->after('email');
+            // Chỉ thêm các cột nếu chưa tồn tại
+            if (!Schema::hasColumn('users', 'gender')) {
+                $table->enum('gender', ['male', 'female', 'other'])->nullable()->after('name');
+            }
+            if (!Schema::hasColumn('users', 'phone')) {
+                $table->string('phone')->nullable()->after('email');
+            }
         });
     }
 
@@ -23,7 +28,17 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn(['gender', 'phone']);
+            // Chỉ xóa các cột nếu tồn tại
+            $columnsToDrop = [];
+            if (Schema::hasColumn('users', 'gender')) {
+                $columnsToDrop[] = 'gender';
+            }
+            if (Schema::hasColumn('users', 'phone')) {
+                $columnsToDrop[] = 'phone';
+            }
+            if (!empty($columnsToDrop)) {
+                $table->dropColumn($columnsToDrop);
+            }
         });
     }
 };

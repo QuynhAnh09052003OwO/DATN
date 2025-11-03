@@ -12,11 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('courses', function (Blueprint $table) {
-            // Drop foreign key constraint first
-            $table->dropForeign(['teacher_id']);
-            
-            // Drop the teacher_id column
-            $table->dropColumn('teacher_id');
+            // Drop foreign key constraint first (chỉ khi tồn tại)
+            if (Schema::hasColumn('courses', 'teacher_id')) {
+                try {
+                    $table->dropForeign(['teacher_id']);
+                } catch (\Exception $e) {
+                    // Foreign key có thể không tồn tại, tiếp tục
+                }
+                
+                // Drop the teacher_id column
+                $table->dropColumn('teacher_id');
+            }
         });
     }
 
@@ -26,8 +32,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('courses', function (Blueprint $table) {
-            // Add back the teacher_id column
-            $table->foreignId('teacher_id')->nullable()->constrained('users')->onDelete('set null')->after('is_locked');
+            // Add back the teacher_id column (chỉ khi chưa tồn tại)
+            if (!Schema::hasColumn('courses', 'teacher_id')) {
+                $table->foreignId('teacher_id')->nullable()->constrained('users')->onDelete('set null')->after('is_locked');
+            }
         });
     }
 };

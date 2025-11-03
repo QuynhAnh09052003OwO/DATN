@@ -12,7 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->enum('role', ['admin', 'teacher', 'student'])->default('student')->after('email');
+            // Chỉ thêm role nếu chưa tồn tại
+            if (!Schema::hasColumn('users', 'role')) {
+                $table->enum('role', ['admin', 'teacher', 'student'])->default('student')->after('email');
+            }
         });
     }
 
@@ -22,7 +25,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('role');
+            // Chỉ xóa role nếu tồn tại
+            if (Schema::hasColumn('users', 'role')) {
+                $table->dropColumn('role');
+            }
         });
     }
 };
