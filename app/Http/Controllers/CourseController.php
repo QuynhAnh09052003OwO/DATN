@@ -85,6 +85,12 @@ class CourseController extends Controller
             'sections.tests',
         ]);
 
+        // Check if user is enrolled as student
+        $isEnrolled = false;
+        if (auth()->check()) {
+            $isEnrolled = $course->students()->where('user_id', auth()->id())->exists();
+        }
+
         return Inertia::render('CourseShow', [
             'course' => [
                 'id' => $course->id,
@@ -95,6 +101,7 @@ class CourseController extends Controller
                 'image' => $course->image,
                 'duration' => $course->duration,
                 'status' => $course->status,
+                'is_enrolled' => $isEnrolled,
                 'categories' => $course->categories->map->only(['id','name'])->values(),
                 'teachers' => $course->teachers->map->only(['id','name','email'])->values(),
                 'sections' => $course->sections->map(function ($s) {
@@ -112,6 +119,7 @@ class CourseController extends Controller
                                 'video_url' => $l->video_url,
                                 'video_duration' => $l->video_duration,
                                 'order' => $l->order,
+                                'is_locked' => $l->is_locked,
                             ];
                         })->values(),
                         'tests' => $s->tests->map(function ($t) {
@@ -130,5 +138,27 @@ class CourseController extends Controller
                 })->values(),
             ],
         ]);
+    }
+
+    public function enroll(Course $course)
+    {
+        // Check if user is authenticated
+        if (!auth()->check()) {
+            return redirect()->route('login.student')->with('error', 'Vui lòng đăng nhập để tham gia khóa học.');
+        }
+
+        // Check if user is already enrolled
+        $user = auth()->user();
+        if ($course->students()->where('user_id', $user->id)->exists()) {
+            return redirect()->back()->with('info', 'Bạn đã tham gia khóa học này rồi.');
+        }
+
+        // Enroll user as student
+        $course->students()->attach($user->id, [
+            'role' => 'student',
+            'enrolled_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Bạn đã tham gia khóa học thành công!');
     }
 }

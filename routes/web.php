@@ -18,6 +18,7 @@ Route::get('/', function () {
 
 Route::get('/courses', [\App\Http\Controllers\CourseController::class, 'index'])->name('courses');
 Route::get('/courses/{course}', [\App\Http\Controllers\CourseController::class, 'show'])->name('courses.show');
+Route::post('/courses/{course}/enroll', [\App\Http\Controllers\CourseController::class, 'enroll'])->middleware('auth')->name('courses.enroll');
 
 /*
 |--------------------------------------------------------------------------
