@@ -99,6 +99,7 @@ class TeacherController extends Controller
 
         $validated = $request->validate([
             'name' => ['nullable','string','max:255'],
+            'email' => ['nullable','string','email','max:255', Rule::unique('users', 'email')->ignore($teacher->id)],
             'phone' => ['nullable','string','max:20'],
             'gender' => ['nullable', Rule::in(['male','female','other'])],
             'course_ids' => ['nullable','array'],
@@ -107,6 +108,7 @@ class TeacherController extends Controller
 
         $teacher->update(array_filter([
             'name' => $validated['name'] ?? null,
+            'email' => $validated['email'] ?? null,
             'phone' => $validated['phone'] ?? null,
             'gender' => $validated['gender'] ?? null,
         ], fn($v) => !is_null($v)));

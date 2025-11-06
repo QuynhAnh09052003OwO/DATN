@@ -14,7 +14,7 @@
             </div>
             <div>
               <Label>Email</Label>
-              <Input :value="teacher.email" disabled />
+              <Input v-model="form.email" />
             </div>
             <div>
               <Label>Điện thoại</Label>
@@ -96,6 +96,7 @@ const props = defineProps({
 
 const form = reactive({
   name: props.teacher?.name || '',
+  email: props.teacher?.email || '',
   phone: props.teacher?.phone || '',
   gender: props.teacher?.gender || null,
   course_ids: Array.isArray(props.teacher?.course_ids) ? [...props.teacher.course_ids] : [],

@@ -156,31 +156,6 @@
         </nav>
       </div>
 
-      <!-- Call to Action -->
-      <div class="mt-16 text-center">
-        <div class="bg-white rounded-lg shadow-lg p-8">
-          <h2 class="text-3xl font-bold text-gray-900 mb-4">
-            Sẵn sàng bắt đầu học tập?
-          </h2>
-          <p class="text-lg text-gray-600 mb-6">
-            Đăng ký tài khoản ngay để truy cập vào các khóa học chất lượng cao
-          </p>
-          <div class="flex justify-center space-x-4">
-            <Link 
-              href="/register" 
-              class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
-            >
-              Đăng ký ngay
-            </Link>
-            <Link 
-              href="/login" 
-              class="border border-blue-600 text-blue-600 hover:bg-blue-50 px-8 py-3 rounded-lg font-semibold transition-colors"
-            >
-              Đăng nhập
-            </Link>
-          </div>
-        </div>d
-      </div>
     </div>
   </PublicLayout>
 </template>
