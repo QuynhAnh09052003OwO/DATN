@@ -135,7 +135,9 @@ Route::middleware(['auth', 'ensure.role:admin'])->prefix('admin')->name('admin.'
 
     // Tests Management (create page)
     Route::get('/courses/{course}/sections/{section}/tests/create', [\App\Http\Controllers\Admin\TestController::class, 'create'])->name('tests.create');
+    Route::get('/courses/{course}/sections/{section}/tests/{test}/edit', [\App\Http\Controllers\Admin\TestController::class, 'edit'])->name('tests.edit');
     Route::post('/sections/{section}/tests-json', [\App\Http\Controllers\Admin\TestController::class, 'storeJson'])->name('tests.storeJson');
+    Route::post('/tests/{test}/json', [\App\Http\Controllers\Admin\TestController::class, 'updateJson'])->name('tests.updateJson');
     Route::put('/lessons/{lesson}', [\App\Http\Controllers\Admin\LessonController::class, 'update'])->name('lessons.update');
     Route::delete('/lessons/{lesson}', [\App\Http\Controllers\Admin\LessonController::class, 'destroy'])->name('lessons.destroy');
     

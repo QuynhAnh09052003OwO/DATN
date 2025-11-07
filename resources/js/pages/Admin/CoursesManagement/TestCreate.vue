@@ -129,21 +129,22 @@ import { router } from '@inertiajs/vue3'
 const props = defineProps({
   course: Object,
   section: Object,
+  test: { type: Object, default: null },
   questions: { type: Array, default: () => [] }
 })
 
 const course = props.course
 const section = props.section
-const testTitle = ref(`Bài kiểm tra - ${section.title}`)
-const questions = reactive((props.questions || []).map(q => ({
+const testTitle = ref(props.test?.title || `Bài kiểm tra - ${section.title}`)
+const questions = reactive((props.questions && props.questions.length ? props.questions : []).map(q => ({
   id: q.id,
-  title: q.title,
+  title: q.title || q.question || '',
   imageFile: null,
-  imageName: '',
+  imageName: q.image ? (q.image.split('/').pop()) : '',
   audioFile: null,
-  audioName: '',
-  answers: [{ id: Date.now(), text: '', type: 'text' }],
-  correctIndex: 0,
+  audioName: q.audio ? (q.audio.split('/').pop()) : '',
+  answers: (q.answers && q.answers.length ? q.answers : [{ id: Date.now(), text: '', type: 'text' }]).map(a => ({ id: a.id || Date.now(), text: a.text || a.context || '', type: 'text' })),
+  correctIndex: typeof q.correctIndex === 'number' ? q.correctIndex : 0,
 })) || [])
 
 function addQuestion () {
@@ -199,9 +200,7 @@ function cancelCreate() {
 async function saveTest() {
   if (!questions.length) return
   const fd = new FormData()
-  // Simple default title; in future, add a real input
   fd.append('title', (testTitle.value && testTitle.value.trim()) ? testTitle.value.trim() : `Bài kiểm tra - ${section.title}`)
-  // Serialize questions (without files)
   const plainQuestions = questions.map((q, idx) => ({
     title: q.title,
     answers: q.answers,
@@ -210,14 +209,18 @@ async function saveTest() {
     points: 1,
   }))
   fd.append('questions', JSON.stringify(plainQuestions))
-  // Attach files per question
   questions.forEach((q, idx) => {
     if (q.imageFile) fd.append(`image_${idx}`, q.imageFile)
     if (q.audioFile) fd.append(`audio_${idx}`, q.audioFile)
   })
 
-  const resp = await fetch(`/admin/sections/${section.id}/tests-json`, {
-    method: 'POST',
+  const isEdit = !!(props.test && props.test.id)
+  const url = isEdit ? `/admin/tests/${props.test.id}/json` : `/admin/sections/${section.id}/tests-json`
+  const method = 'POST'
+  if (isEdit) fd.append('_method', 'PUT')
+
+  const resp = await fetch(url, {
+    method,
     headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json', 'X-CSRF-TOKEN': (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '') },
     credentials: 'same-origin',
     body: fd
@@ -226,7 +229,7 @@ async function saveTest() {
     console.error('Save test failed', resp.status)
     return
   }
-  const data = await resp.json()
+  await resp.json()
   router.visit(`/admin/courses/${course.id}/edit`)
 }
 </script>

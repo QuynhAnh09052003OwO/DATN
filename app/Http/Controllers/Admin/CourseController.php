@@ -144,7 +144,7 @@ class CourseController extends Controller
     // JSON: fetch sections with lessons for a course
     public function sectionsJson(Course $course)
     {
-        $course->load(['sections.lessons']);
+        $course->load(['sections.lessons', 'sections.tests']);
         return response()->json([
             'sections' => $course->sections->map(function ($s) {
                 return [
@@ -162,6 +162,14 @@ class CourseController extends Controller
                             'video_duration' => $l->video_duration,
                             'order' => $l->order,
                             'is_locked' => (bool) $l->is_locked,
+                        ];
+                    }),
+                    'tests' => $s->tests->map(function ($t) {
+                        return [
+                            'id' => $t->id,
+                            'title' => $t->title,
+                            'order' => $t->order,
+                            'is_locked' => (bool) $t->is_locked,
                         ];
                     }),
                 ];

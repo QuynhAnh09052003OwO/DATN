@@ -374,6 +374,14 @@
                 </div>
               </div>
 
+                            <!-- Hiển thị bài kiểm tra của học phần (nếu có) -->
+                            <div v-if="section.tests && section.tests.length" class="space-y-2">
+                <div v-for="t in section.tests" :key="t.id" class="flex items-center justify-between rounded-md border p-3 bg-white">
+                  <div class="text-sm text-gray-800 font-medium">{{ t.title }}</div>
+                  <button type="button" class="text-blue-600 hover:text-blue-800" @click="editTest(section, t)">Chỉnh sửa</button>
+                </div>
+              </div>
+
             <!-- Actions: Thêm bài học / bài kiểm tra -->
             <div class="mt-4 border-t pt-4">
               <div class="flex items-center gap-3 mb-4">
@@ -387,6 +395,7 @@
                   + Thêm bài kiểm tra
                 </button>
               </div>
+
             </div>
 
             <!-- Section actions INSIDE the section card -->
@@ -707,6 +716,11 @@ function addQuiz(sectionIdx) {
   router.visit(`/admin/courses/${props.course.id}/sections/${section.serverId}/tests/create`)
 }
 
+function editTest(section, test) {
+  if (!section?.serverId || !test?.id) return
+  router.visit(`/admin/courses/${props.course.id}/sections/${section.serverId}/tests/${test.id}/edit`)
+}
+
 // Load sections from server and bind to local state
 async function loadSections() {
   try {
@@ -730,7 +744,8 @@ async function loadSections() {
         attachmentName: l.attachment ? l.attachment.split('/').pop() : '',
         order: l.order,
         videoDuration: l.video_duration || 0
-      }))
+      })),
+      tests: (s.tests || []).map(t => ({ id: t.id, title: t.title, order: t.order }))
     }))
     sections.value = mapped
   } catch (e) {
