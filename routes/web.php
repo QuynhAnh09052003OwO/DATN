@@ -142,9 +142,9 @@ Route::middleware(['auth', 'ensure.role:admin'])->prefix('admin')->name('admin.'
     Route::delete('/lessons/{lesson}', [\App\Http\Controllers\Admin\LessonController::class, 'destroy'])->name('lessons.destroy');
     
     // Students Management
-    Route::get('/students', function () {
-        return Inertia::render('Admin/Students');
-    })->name('students');
+    Route::get('/students', [\App\Http\Controllers\Admin\StudentController::class, 'index'])->name('students');
+    Route::get('/students/{student}/edit', [\App\Http\Controllers\Admin\StudentController::class, 'edit'])->name('students.edit');
+    Route::post('/students/{student}/courses', [\App\Http\Controllers\Admin\StudentController::class, 'updateCourses'])->name('students.updateCourses');
     
     // Users Management
     Route::get('/users', function () {
@@ -182,11 +182,17 @@ Route::middleware(['auth', 'verified', 'role:student'])->prefix('student')->name
     Route::get('/', function () {
         return Inertia::render('Student/Dashboard');
     })->name('dashboard');
-    
+
     Route::get('/courses', function () {
-        return Inertia::render('Student/Courses');
+        $user = \Illuminate\Support\Facades\Auth::user();
+        $courses = $user->enrolledCourses()->with(['categories'])->orderBy('created_at', 'desc')->get();
+        return Inertia::render('Student/Courses', [
+            'courses' => $courses,
+        ]);
     })->name('courses');
-    
+
+    Route::get('/courses/{course}/learn', [\App\Http\Controllers\Student\CourseLearningController::class, 'show'])->name('courses.learn');
+
     Route::get('/profile', function () {
         return Inertia::render('Student/Profile');
     })->name('profile');

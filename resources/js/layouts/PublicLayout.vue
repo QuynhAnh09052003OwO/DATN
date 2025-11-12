@@ -65,6 +65,15 @@
                   @click.away="userMenuOpen = false"
                   class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
                 >
+                  <!-- Student: My Courses -->
+                  <Link 
+                    v-if="user && user.role === 'student'"
+                    href="/student/courses" 
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    @click="userMenuOpen = false"
+                  >
+                    Khóa học của tôi
+                  </Link>
                   <!-- Show "Quản lý" if user is admin -->
                   <Link 
                     v-if="user && user.role === 'admin'"
